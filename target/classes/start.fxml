@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="520.0" prefWidth="1240.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bomberman.startController">
+    <children>
+        <ImageView fitHeight="520.0" fitWidth="1240.0">
+            <image>
+                <Image url="@image/background.png" />
+            </image>
+        </ImageView>
+        <Group fx:id="showStart" layoutX="0" layoutY="0">
+           <children>
+               <ImageView fx:id="playPvB" fitHeight="128.0" fitWidth="278.0" layoutX="295.0" layoutY="205.0">
+                   <image>
+                       <Image url="@image/play_pvb.png" />
+                   </image>
+                   <cursor>
+                       <Cursor fx:constant="HAND" />
+                   </cursor>
+               </ImageView>
+               <ImageView fx:id="playPvP" fitHeight="128.0" fitWidth="278.0" layoutX="295.0" layoutY="350.0">
+                   <image>
+                       <Image url="@image/play_pvp.png" />
+                   </image>
+                   <cursor>
+                       <Cursor fx:constant="HAND" />
+                   </cursor>
+               </ImageView>
+           </children>
+        </Group>
+        <Group fx:id="showStart1" layoutX="0" layoutY="0">
+           <children>
+               <ImageView fx:id="backMenu" fitHeight="39.0" fitWidth="106.0">
+                   <image>
+                       <Image url="@image/back_menu.png" />
+                   </image>
+                   <cursor>
+                       <Cursor fx:constant="HAND" />
+                   </cursor>
+               </ImageView>
+               <ImageView fx:id="createSV" fitHeight="77.0" fitWidth="272.0" layoutX="93.0" layoutY="216.0">
+                   <image>
+                       <Image url="@image/create_server.png" />
+                   </image>
+               </ImageView>
+               <ImageView fx:id="joinSV" fitHeight="77.0" fitWidth="272.0" layoutX="438.0" layoutY="216.0">
+                   <image>
+                       <Image url="@image/join_server.png" />
+                   </image>
+                   <cursor>
+                       <Cursor fx:constant="HAND" />
+                   </cursor>
+               </ImageView>
+           </children>
+        </Group>
+        <Group fx:id="createSv" layoutX="0" layoutY="0">
+           <children>
+               <TextArea fx:id="textIP" layoutX="152.0" layoutY="325.0" opacity="0.72" prefHeight="51.0" prefWidth="494.0" promptText="IP address">
+                   <font>
+                       <Font size="24.0" />
+                   </font>
+                   <cursor>
+                       <Cursor fx:constant="TEXT" />
+                   </cursor>
+               </TextArea>
+               <Text fill="#bf2a2a" layoutX="146.0" layoutY="450.0" strokeType="OUTSIDE" strokeWidth="0.0" text="share this IP with your friends">
+                   <font>
+                       <Font name="System Bold Italic" size="36.0" />
+                   </font>
+               </Text>
+           </children>
+        </Group>
+        <Group fx:id="joinSv" layoutX="0" layoutY="0">
+           <children>
+               <TextArea fx:id="byIP" editable="true" layoutX="152.0" layoutY="325.0" opacity="0.72" prefHeight="51.0" prefWidth="494.0" promptText="IP address">
+                   <font>
+                       <Font size="24.0" />
+                   </font>
+                   <cursor>
+                       <Cursor fx:constant="TEXT" />
+                   </cursor>
+               </TextArea>
+               <Button fx:id="join" layoutX="369.0" layoutY="414.0" mnemonicParsing="false" text="Join" textFill="#c63535">
+                   <font>
+                       <Font name="System Bold" size="18.0" />
+                   </font>
+                   <cursor>
+                       <Cursor fx:constant="HAND" />
+                   </cursor>
+               </Button>
+           </children>
+        </Group>
+
+    </children>
+</AnchorPane>
