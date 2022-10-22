@@ -24,7 +24,7 @@ public class SoundVariable {
             JSONObject jsonObject = new JSONObject();
 
             try {
-                jsonObject.put("Audio", FilesPath.encodeClipName(clip));
+                jsonObject.put("Audio", FilesPath.getClipName(clip));
                 jsonObject.put("Mode", "Play");
                 GameVariables.tempCommandList.put(jsonObject);
 
@@ -55,7 +55,7 @@ public class SoundVariable {
             JSONObject jsonObject = new JSONObject();
 
             try {
-                jsonObject.put("Audio", FilesPath.encodeClipName(clip));
+                jsonObject.put("Audio", FilesPath.getClipName(clip));
                 jsonObject.put("Mode", "Loop");
                 jsonObject.put("Time", "" + time);
                 GameVariables.tempCommandList.put(jsonObject);

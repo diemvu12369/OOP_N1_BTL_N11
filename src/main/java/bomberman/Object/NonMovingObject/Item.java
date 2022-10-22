@@ -39,28 +39,28 @@ public class Item extends Block {
     /**
      * Constructor cho Item.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Item(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Item(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
     }
 
     /**
      * Constructor cho Item.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      * @param type     loại item
      */
-    public Item(PlayGround belongTo, double x, double y, double width, double length, typeOfItems type) {
-        super(belongTo, x, y, width, length);
+    public Item(PlayGround correspondingPlayGround, double x, double y, double width, double length, typeOfItems type) {
+        super(correspondingPlayGround, x, y, width, length);
 
         this.type = type;
     }

@@ -11,14 +11,14 @@ public class Grass extends GameObject {
     /**
      * Constructor cho Grass.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Grass(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Grass(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
     }
 
     @Override

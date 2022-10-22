@@ -84,7 +84,7 @@ public class BombermanApplication extends Application {
                     GameVariables.commandList = new JSONArray();
                     GameVariables.tempCommandList = new JSONArray();
                     GameVariables.commandListString = new String();
-                    GameVariables.PvP_Mode=null;
+                    GameVariables.PvP=null;
                 }
             }
         }.start();
@@ -103,10 +103,10 @@ public class BombermanApplication extends Application {
         isChange = false;
         runningMode = Mode.PvB;
 
-        GameVariables.PvB_Mode = new PvB_GamePlay();
+        GameVariables.PvB = new PvB_GamePlay();
 
-        GameVariables.PvB_Mode.render();
-        GameVariables.PvB_Mode.playPlayGroundAudio();
+        GameVariables.PvB.render();
+        GameVariables.PvB.playPlayGroundAudio();
 
         RenderVariable.scene.setOnMouseClicked(mouseEvent -> {
             double x = mouseEvent.getX();
@@ -124,10 +124,10 @@ public class BombermanApplication extends Application {
             }
         });
 
-        RenderVariable.scene.setOnKeyPressed(GameVariables.PvB_Mode::inputKeyPress);
-        RenderVariable.scene.setOnKeyReleased(GameVariables.PvB_Mode::inputKeyRelease);
+        RenderVariable.scene.setOnKeyPressed(GameVariables.PvB::inputKeyPress);
+        RenderVariable.scene.setOnKeyReleased(GameVariables.PvB::inputKeyRelease);
 
-        GameVariables.PvB_Mode.setGameStatus(PvB_GamePlay.gameStatusType.PLAYING_);
+        GameVariables.PvB.setGameStatus(PvB_GamePlay.typeOfGameStatus.PLAYING_);
         new AnimationTimer() {
             boolean stopped = false;
 
@@ -142,15 +142,15 @@ public class BombermanApplication extends Application {
                     runningMode = Mode.MENU;
                 }
 
-                if (GameVariables.PvB_Mode.getGameStatus() == PvB_GamePlay.gameStatusType.PLAYING_) {
-                    GameVariables.PvB_Mode.play();
+                if (GameVariables.PvB.getGameStatus() == PvB_GamePlay.typeOfGameStatus.PLAYING_) {
+                    GameVariables.PvB.play();
                 } else {
                     stopped = true;
                 }
 
                 if (runningMode == Mode.MENU) {
                     isChange = true;
-                    GameVariables.PvB_Mode = null;
+                    GameVariables.PvB = null;
                     this.stop();
                 }
             }
@@ -242,7 +242,7 @@ public class BombermanApplication extends Application {
                         isChange = true;
                         runningMode = Mode.PvPPLAYING;
 
-                        GameVariables.PvP_Mode.needToWait = true;
+                        GameVariables.PvP.needToWait = true;
 
                         this.stop();
                     } catch (IOException e) {
@@ -306,8 +306,8 @@ public class BombermanApplication extends Application {
                 // **************************************
 
                 if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-                    if (GameVariables.PvP_Mode.getGameStatus() == PvP_GamePlay.gameStatusType.PLAYING_) {
-                        GameVariables.PvP_Mode.play();
+                    if (GameVariables.PvP.getGameStatus() == PvP_GamePlay.typeOfGameStatus.PLAYING_) {
+                        GameVariables.PvP.play();
                     }
                 }
 
@@ -345,7 +345,7 @@ public class BombermanApplication extends Application {
                     GameVariables.commandList = new JSONArray();
                     GameVariables.tempCommandList = new JSONArray();
                     GameVariables.commandListString = new String();
-                    GameVariables.PvP_Mode=null;
+                    GameVariables.PvP=null;
                     isChange = true;
                     this.stop();
                 }

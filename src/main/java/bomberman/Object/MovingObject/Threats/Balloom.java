@@ -10,25 +10,25 @@ public class Balloom extends Enemy {
     /**
      * Constructor cho Balloom.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Balloom(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Balloom(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
     }
 
     /**
      * Constructor cho Balloom.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      */
-    public Balloom(PlayGround belongTo, double x, double y) {
-        super(belongTo, x, y);
+    public Balloom(PlayGround correspondingPlayGround, double x, double y) {
+        super(correspondingPlayGround, x, y);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class Balloom extends Enemy {
         setNumberOfFramePerSprite(6);
     }
 
-    public void die() {
+    public void dead() {
         SoundVariable.playSound(FilesPath.BalloomDieAudio);
     }
 }

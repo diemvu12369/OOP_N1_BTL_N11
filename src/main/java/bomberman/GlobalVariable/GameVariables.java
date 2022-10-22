@@ -9,26 +9,26 @@ public class GameVariables {
      * Chế độ chơi PvB.
      * (Khởi tạo biến này khi chế độ PvB bắt đầu chơi.
      */
-    public static PvB_GamePlay PvB_Mode;
+    public static PvB_GamePlay PvB;
 
     /**
      * Chế độ PvP trên 2 máy thông qua LAN
      */
-    public static PvP_GamePlay PvP_Mode;
+    public static PvP_GamePlay PvP;
 
     /**
      * Độ lớn của một cell trong game.
      */
-    public static final double cellLength = 40;
+    public static final double unitLength = 40;
 
     /**
      * Hàm trả về giá trị đầu vào chia cho độ lớn của cell để ra chỉ số ô cần thiết.
      *
-     * @param inputValue giá trị đầu vào
+     * @param Input giá trị đầu vào
      * @return kết quả
      */
-    public static int calculateCellIndex(double inputValue) {
-        return (int) (inputValue / cellLength);
+    public static int calculateCellIndex(double Input) {
+        return (int) (Input / unitLength);
     }
 
     public enum role {

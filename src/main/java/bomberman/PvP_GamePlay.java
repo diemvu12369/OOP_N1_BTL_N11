@@ -15,7 +15,7 @@ public class PvP_GamePlay {
     /**
      * Trạng thái game (đang chơi, thắng, thua).
      */
-    public enum gameStatusType {
+    public enum typeOfGameStatus {
         PLAYING_,
         NOTPLAYING_,
     }
@@ -23,13 +23,13 @@ public class PvP_GamePlay {
     /**
      * Trạng thái game hiện tại.
      */
-    private gameStatusType gameStatus;
+    private typeOfGameStatus gameStatus;
 
-    public void setGameStatus(gameStatusType inputGameStatus) {
+    public void setGameStatus(typeOfGameStatus inputGameStatus) {
         gameStatus = inputGameStatus;
     }
 
-    public gameStatusType getGameStatus() {
+    public typeOfGameStatus getGameStatus() {
         return gameStatus;
     }
 
@@ -109,7 +109,7 @@ public class PvP_GamePlay {
         SoundVariable.endAllSounds();
 
         GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = gameStatusType.NOTPLAYING_;
+        gameStatus = typeOfGameStatus.NOTPLAYING_;
     }
 
     /**
@@ -141,7 +141,7 @@ public class PvP_GamePlay {
         SoundVariable.endAllSounds();
 
         GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = gameStatusType.NOTPLAYING_;
+        gameStatus = typeOfGameStatus.NOTPLAYING_;
     }
 
     /**
@@ -173,7 +173,7 @@ public class PvP_GamePlay {
         SoundVariable.endAllSounds();
 
         GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = gameStatusType.NOTPLAYING_;
+        gameStatus = typeOfGameStatus.NOTPLAYING_;
     }
 
     /**
@@ -218,20 +218,20 @@ public class PvP_GamePlay {
         //cập nhật trạng thái của bản đồ
         for (int i = 0; i < map.getNumberOfRow(); i++) {
             for (int j = 0; j < map.getNumberOfColumn(); j++) {
-                GameObject now = map.getCells(i, j);
+                GameObject currentCell = map.getCells(i, j);
 
                 //hủy những ô brick đã hết thời gian nổ
-                if (now instanceof Brick) {
-                    if (((Brick) now).checkExplodingExpired()) {
-                        ((Brick) now).setBlockState(Block.BlockState.FINAL_STATE_);
+                if (currentCell instanceof Brick) {
+                    if (((Brick) currentCell).checkExplodingExpired()) {
+                        ((Brick) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
                     }
                 }
 
                 //hủy những ô item đã hết thời gian nổ
-                if (now instanceof Item) {
-                    if (((Item) now).checkExplodingExpired()) {
+                if (currentCell instanceof Item) {
+                    if (((Item) currentCell).checkExplodingExpired()) {
                         SoundVariable.playSound(FilesPath.ItemAppearsAudio);
-                        ((Item) now).setBlockState(Block.BlockState.FINAL_STATE_);
+                        ((Item) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
                     }
                 }
             }
@@ -242,7 +242,7 @@ public class PvP_GamePlay {
             if (map.getBombs().get(i).checkExplode()) {
                 map.getBombs().get(i).detonateBomb();
 
-                map.getBombs().get(i).getOwner().changeCurrentBomb(-1);
+                map.getBombs().get(i).getOwner().modifyCurrentBomb(-1);
 
                 map.removeBomb(i);
 
@@ -264,7 +264,7 @@ public class PvP_GamePlay {
                     if (map.getFlames().get(i).checkIntersect(map.getBombs().get(j))) {
                         map.getBombs().get(j).detonateBomb();
 
-                        map.getBombs().get(j).getOwner().changeCurrentBomb(-1);
+                        map.getBombs().get(j).getOwner().modifyCurrentBomb(-1);
 
                         map.removeBomb(j);
 
@@ -298,21 +298,21 @@ public class PvP_GamePlay {
 
             switch ((String) command.get("direction")) {
                 case "placeBomb":
-                    if (player.canCreateBomb()) {
-                        player.createBomb();
+                    if (player.canPlaceBomb()) {
+                        player.placeBomb();
                     }
                     break;
                 case "RIGHT_":
-                    player.setObjectDirection(MovingObject.ObjectDirection.RIGHT_, (boolean) command.get("status"));
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, (boolean) command.get("status"));
                     break;
                 case "LEFT_":
-                    player.setObjectDirection(MovingObject.ObjectDirection.LEFT_, (boolean) command.get("status"));
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, (boolean) command.get("status"));
                     break;
                 case "UP_":
-                    player.setObjectDirection(MovingObject.ObjectDirection.UP_, (boolean) command.get("status"));
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.UP_, (boolean) command.get("status"));
                     break;
                 case "DOWN_":
-                    player.setObjectDirection(MovingObject.ObjectDirection.DOWN_, (boolean) command.get("status"));
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, (boolean) command.get("status"));
                     break;
             }
         } catch (JSONException e) {

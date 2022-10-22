@@ -81,7 +81,7 @@ public class PlayGround {
         return players;
     }
 
-    public void clearPlayers() {
+    public void resetPlayers() {
         players.clear();
     }
 
@@ -94,12 +94,12 @@ public class PlayGround {
         return enemies;
     }
 
-    public void clearEnemies() {
+    public void resetEnemies() {
         enemies.clear();
     }
 
-    public void removeEnemy(int index) {
-        enemies.remove(index);
+    public void removeEnemy(int position) {
+        enemies.remove(position);
     }
 
     /**
@@ -111,12 +111,12 @@ public class PlayGround {
         return bombs;
     }
 
-    public void clearBombs() {
+    public void resetBombs() {
         bombs.clear();
     }
 
-    public void addBomb(Bomb tempBomb) {
-        bombs.add(tempBomb);
+    public void addBomb(Bomb currentBomb) {
+        bombs.add(currentBomb);
     }
 
     public void removeBomb(int index) {
@@ -127,14 +127,14 @@ public class PlayGround {
      * Trạng thái ô đó có bomb hay không.
      * True là có bomb, false là không có bomb.
      */
-    private boolean[][] stateBomb = new boolean[50][50];
+    private boolean[][] bombState = new boolean[50][50];
 
-    public boolean getStateBomb(int tempX, int tempY) {
-        return stateBomb[tempX][tempY];
+    public boolean getBombState(int tempX, int tempY) {
+        return bombState[tempX][tempY];
     }
 
-    public void setStateBomb(int tempX, int tempY, boolean value) {
-        stateBomb[tempX][tempY] = value;
+    public void setBombState(int tempX, int tempY, boolean value) {
+        bombState[tempX][tempY] = value;
     }
 
     /**
@@ -146,7 +146,7 @@ public class PlayGround {
         return flames;
     }
 
-    public void clearFlames() {
+    public void resetFlames() {
         flames.clear();
     }
 
@@ -184,7 +184,7 @@ public class PlayGround {
     /**
      * Độ dài cạnh của một ô.
      */
-    private final double cellLength = GameVariables.cellLength;
+    private final double unitLength = GameVariables.unitLength;
 
     // ***********************************************************************************************
 
@@ -205,29 +205,29 @@ public class PlayGround {
      * @param mapPath đường dẫn đến map
      */
     private void readMapsFromFile(String mapPath) {
-        InputStream fileInputStream = null;
-        BufferedReader bufferedReader = null;
+        InputStream inputStream = null;
+        BufferedReader reader = null;
 
         try {
-            fileInputStream = FilesPath.class.getResource(mapPath).openStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+            inputStream = FilesPath.class.getResource(mapPath).openStream();
+            reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String[] item;
 
-            String line = bufferedReader.readLine();
+            String line = reader.readLine();
             item = line.split(" ");
             maxLevel = Integer.parseInt(item[0]);
             numberOfRow = Integer.parseInt(item[1]);
             numberOfColumn = Integer.parseInt(item[2]);
 
-            mapLength = cellLength * numberOfColumn;
-            mapWidth = cellLength * numberOfRow;
+            mapLength = unitLength * numberOfColumn;
+            mapWidth = unitLength * numberOfRow;
 
-            for (int levelNow = 0; levelNow < maxLevel; levelNow++) {
+            for (int currentLevel = 0; currentLevel < maxLevel; currentLevel++) {
                 for (int i = 0; i < numberOfRow; i++) {
-                    line = bufferedReader.readLine();
+                    line = reader.readLine();
                     for (int j = 0; j < numberOfColumn; j++) {
-                        allLevelMaps[levelNow][i][j] = line.charAt(j);
+                        allLevelMaps[currentLevel][i][j] = line.charAt(j);
                     }
                 }
             }
@@ -237,8 +237,8 @@ public class PlayGround {
             System.out.println("IO exception");
         } finally {
             try {
-                bufferedReader.close();
-                fileInputStream.close();
+                reader.close();
+                inputStream.close();
             } catch (IOException ex) {
                 System.out.println("IO exception");
             }
@@ -249,58 +249,58 @@ public class PlayGround {
      * Tạo tình trạng map của level hiện tại.
      */
     public void createMapAtLevel() {
-        clearPlayers();
-        clearEnemies();
-        clearBombs();
-        clearFlames();
+        resetPlayers();
+        resetEnemies();
+        resetBombs();
+        resetFlames();
 
-        for (int y = 0; y < numberOfRow; y++) {
-            for (int i = 0; i < numberOfColumn; i++) {
-                char tmp = allLevelMaps[level][y][i];
+        for (int i = 0; i < numberOfRow; i++) {
+            for (int j = 0; j < numberOfColumn; j++) {
+                char tmp = allLevelMaps[level][i][j];
                 switch (tmp) {
                     case 'p':
-                        players.add(new Bomber(this, cellLength * i, cellLength * y));
-                        cells[y][i] = new Grass(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        players.add(new Bomber(this, unitLength * j, unitLength * i));
+                        cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '#':
-                        cells[y][i] = new Wall(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        cells[i][j] = new Wall(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '*':
-                        cells[y][i] = new Brick(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        cells[i][j] = new Brick(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case 'x':
-                        cells[y][i] = new Portal(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        cells[i][j] = new Portal(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case 'b':
-                        cells[y][i] = new Item(this, cellLength * i, cellLength * y, cellLength, cellLength, Item.typeOfItems.BOMB_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.BOMB_ITEM_);
                         break;
                     case 'f':
-                        cells[y][i] = new Item(this, cellLength * i, cellLength * y, cellLength, cellLength, Item.typeOfItems.FLAME_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.FLAME_ITEM_);
                         break;
                     case 's':
-                        cells[y][i] = new Item(this, cellLength * i, cellLength * y, cellLength, cellLength, Item.typeOfItems.SPEED_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.SPEED_ITEM_);
                         break;
                     case '1':
-                        enemies.add(new Balloom(this, cellLength * i, cellLength * y));
-                        cells[y][i] = new Grass(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        enemies.add(new Balloom(this, unitLength * j, unitLength * i));
+                        cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '2':
-                        enemies.add(new Oneal(this, cellLength * i, cellLength * y));
-                        cells[y][i] = new Grass(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        enemies.add(new Oneal(this, unitLength * j, unitLength * i));
+                        cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '3':
-                        enemies.add(new Teleport(this, cellLength * i, cellLength * y));
-                        cells[y][i] = new Grass(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        enemies.add(new Teleport(this, unitLength * j, unitLength * i));
+                        cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     default:
-                        cells[y][i] = new Grass(this, cellLength * i, cellLength * y, cellLength, cellLength);
+                        cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                 }
             }
         }
 
         for (int i = 0; i < numberOfRow; i++) {
             for (int j = 0; j < numberOfColumn; j++) {
-                stateBomb[i][j] = false;
+                bombState[i][j] = false;
             }
         }
     }
@@ -308,34 +308,34 @@ public class PlayGround {
     /**
      * Kiểm tra một ô có bị chặn không.
      *
-     * @param temp_x chỉ số x
-     * @param temp_y chỉ số y
+     * @param current_x chỉ số x
+     * @param current_y chỉ số y
      * @return có bị block hoặc không
      */
-    public boolean isBlockCell(int temp_x, int temp_y) {
+    public boolean isCellBlocked(int current_x, int current_y) {
         //các trường hợp bị chặn
         //ô tường
-        if ((cells[temp_x][temp_y] instanceof Wall)) {
+        if ((cells[current_x][current_y] instanceof Wall)) {
             return true;
         }
 
         // ô gạch chưa bị nổ
-        if (cells[temp_x][temp_y] instanceof Brick) {
-            if (!((Brick) cells[temp_x][temp_y]).isFinalState()) {
+        if (cells[current_x][current_y] instanceof Brick) {
+            if (!((Brick) cells[current_x][current_y]).isFinalState()) {
                 return true;
             }
         }
 
         // ô item chưa bị nổ
-        if ((cells[temp_x][temp_y] instanceof Item)) {
-            if (!((Item) cells[temp_x][temp_y]).isFinalState()) {
+        if ((cells[current_x][current_y] instanceof Item)) {
+            if (!((Item) cells[current_x][current_y]).isFinalState()) {
                 return true;
             }
         }
 
         // ô portal chưa bị nổ
-        if ((cells[temp_x][temp_y] instanceof Portal)) {
-            if (!((Portal) cells[temp_x][temp_y]).isFinalState()) {
+        if ((cells[current_x][current_y] instanceof Portal)) {
+            if (!((Portal) cells[current_x][current_y]).isFinalState()) {
                 return true;
             }
         }

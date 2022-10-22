@@ -70,14 +70,14 @@ public abstract class Block extends GameObject {
     /**
      * Constructor cho block.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Block(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Block(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
 
         blockState = BlockState.INITIAL_STATE_;
     }

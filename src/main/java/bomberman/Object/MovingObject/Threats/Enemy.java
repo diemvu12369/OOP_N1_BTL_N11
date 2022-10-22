@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 
 public abstract class Enemy extends MovingObject {
     private int type = 1;
-    public boolean moveRandom = true;
+    public boolean randomMove = true;
     /**
      * Thời gian di chuyển theo hướng hiện tại
      */
@@ -20,14 +20,14 @@ public abstract class Enemy extends MovingObject {
     /**
      * Constructor cho Enemy.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Enemy(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Enemy(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
 
         setSpeed(2);
     }
@@ -35,47 +35,47 @@ public abstract class Enemy extends MovingObject {
     /**
      * Constructor cho Enemy.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      */
-    public Enemy(PlayGround belongTo, double x, double y) {
-        super(belongTo, x, y, 35, 35); // Kích thước mặc định
+    public Enemy(PlayGround correspondingPlayGround, double x, double y) {
+        super(correspondingPlayGround, x, y, 35, 35); // Kích thước mặc định
 
         setSpeed(2);
     }
 
     @Override
     public void move() {
-        if (!moveRandom) {
+        if (!randomMove) {
             super.move();
             return;
         }
         if (System.nanoTime() - startTime >= duration) {
-            boolean toUp, toRight, toDown, toLeft;
+            boolean headingUp, headingRight, headingDown, headingLeft;
 
-            toRight = ThreadLocalRandom.current().nextBoolean();
+            headingRight = ThreadLocalRandom.current().nextBoolean();
 
-            if (toRight) {
-                toLeft = false;
+            if (headingRight) {
+                headingLeft = false;
             } else {
-                toLeft = ThreadLocalRandom.current().nextBoolean();
+                headingLeft = ThreadLocalRandom.current().nextBoolean();
             }
 
-            toUp = ThreadLocalRandom.current().nextBoolean();
+            headingUp = ThreadLocalRandom.current().nextBoolean();
 
-            if (!toUp && !toRight && !toLeft) {
-                toDown = true;
-            } else if (toUp) {
-                toDown = false;
+            if (!headingUp && !headingRight && !headingLeft) {
+                headingDown = true;
+            } else if (headingUp) {
+                headingDown = false;
             } else {
-                toDown = ThreadLocalRandom.current().nextBoolean();
+                headingDown = ThreadLocalRandom.current().nextBoolean();
             }
 
-            setObjectDirection(MovingObject.ObjectDirection.RIGHT_, toRight);
-            setObjectDirection(MovingObject.ObjectDirection.LEFT_, toLeft);
-            setObjectDirection(MovingObject.ObjectDirection.UP_, toUp);
-            setObjectDirection(MovingObject.ObjectDirection.DOWN_, toDown);
+            setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, headingRight);
+            setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, headingLeft);
+            setDirectionOfObject(MovingObject.DirectionOfObject.UP_, headingUp);
+            setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, headingDown);
 
             startTime = System.nanoTime();
         }
@@ -83,7 +83,7 @@ public abstract class Enemy extends MovingObject {
         super.move();
     }
 
-    public void die() {
+    public void dead() {
     }
 
     public int getType() {
@@ -100,12 +100,12 @@ public abstract class Enemy extends MovingObject {
         Image currentImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double imageWidth = currentImage.getHeight();
-        double imageLength = currentImage.getWidth();
+        double widthOfImage = currentImage.getHeight();
+        double lengthOfImage = currentImage.getWidth();
 
-        double spriteSize = imageWidth;
+        double sizeOfSprite = widthOfImage;
 
-        numberOfSprite = (int) (imageLength / spriteSize);
+        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
         if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
@@ -119,6 +119,6 @@ public abstract class Enemy extends MovingObject {
         // Render
         setPosRender(-5, -10, 10, 10);
 
-        render(currentImage, currentSprite * spriteSize, 0, spriteSize, spriteSize);
+        render(currentImage, currentSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 }

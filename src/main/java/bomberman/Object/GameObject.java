@@ -16,16 +16,16 @@ import org.json.JSONObject;
 public abstract class GameObject {
     /**
      * Tham chiếu đến PlayGround mà object này thuộc về trong đó.
-     * (Đặt là belongTo để tránh trùng lặp với owner của bomb)
+     * (Đặt là correspondingPlayGround để tránh trùng lặp với owner của bomb)
      */
-    private PlayGround belongTo;
+    private PlayGround correspondingPlayGround;
 
-    public void setBelongTo(PlayGround belongTo) {
-        this.belongTo = belongTo;
+    public void setCorrespondingPlayGround(PlayGround correspondingPlayGround) {
+        this.correspondingPlayGround = correspondingPlayGround;
     }
 
-    public PlayGround getBelongTo() {
-        return belongTo;
+    public PlayGround getCorrespondingPlayGround() {
+        return correspondingPlayGround;
     }
 
     /**
@@ -108,14 +108,14 @@ public abstract class GameObject {
     /**
      * Constructor cho object của game.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public GameObject(PlayGround belongTo, double x, double y, double width, double length) {
-        this.belongTo = belongTo;
+    public GameObject(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        this.correspondingPlayGround = correspondingPlayGround;
 
         this.x = x;
         this.y = y;
@@ -146,8 +146,8 @@ public abstract class GameObject {
      * @param _y tọa độ y
      * @return có hoặc không
      */
-    public boolean checkPointInside(double _x, double _y) {
-        return x <= _x && _x <= x + width && y <= _y && _y <= y + length;
+    public boolean checkPointInside(double x, double y) {
+        return this.x <= x && x <= this.x + width && this.y <= y && y <= this.y + length;
     }
 
     /**
@@ -166,17 +166,17 @@ public abstract class GameObject {
     /**
      * Kiểm tra xem object này có chạm với khối kia không.
      *
-     * @param temp_x_1 min x
-     * @param temp_x_2 max x
-     * @param temp_y_1 min y
-     * @param temp_y_2 max y
+     * @param current_x_1 min x
+     * @param current_x_2 max x
+     * @param current_y_1 min y
+     * @param current_y_2 max y
      * @return có hoặc không
      */
-    public boolean checkIntersect(double temp_x_1, double temp_x_2, double temp_y_1, double temp_y_2) {
-        return !(x >= temp_x_2) &&
-                !(y >= temp_y_2) &&
-                !(x + width <= temp_x_1) &&
-                !(y + length <= temp_y_1);
+    public boolean checkIntersect(double current_x_1, double current_x_2, double current_y_1, double current_y_2) {
+        return !(x >= current_x_2) &&
+                !(y >= current_y_2) &&
+                !(x + width <= current_x_1) &&
+                !(y + length <= current_y_1);
     }
 
     // ****************************************** RENDER *************************************************
@@ -256,12 +256,12 @@ public abstract class GameObject {
         Image currentImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double imageWidth = currentImage.getHeight();
-        double imageLength = currentImage.getWidth();
+        double widthOfImage = currentImage.getHeight();
+        double lengthOfImage = currentImage.getWidth();
 
-        double spriteSize = imageWidth;
+        double sizeOfSprite = widthOfImage;
 
-        numberOfSprite = (int) (imageLength / spriteSize);
+        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
         if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
@@ -275,7 +275,7 @@ public abstract class GameObject {
         // Render
         setPosRender(0, 0, 0, 0);
 
-        render(currentImage, currentSprite * spriteSize, 0, spriteSize, spriteSize);
+        render(currentImage, currentSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 
     /**
@@ -285,11 +285,11 @@ public abstract class GameObject {
         if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("Image", FilesPath.encodeImageName(currentImage));
+                jsonObject.put("Image", FilesPath.getImageName(currentImage));
                 jsonObject.put("imageX", "" + renderX);
                 jsonObject.put("imageY", "" + renderY);
-                jsonObject.put("imageWidth", "" + renderWidth);
-                jsonObject.put("imageLength", "" + renderLength);
+                jsonObject.put("widthOfImage", "" + renderWidth);
+                jsonObject.put("lengthOfImage", "" + renderLength);
                 jsonObject.put("x", "" + posRenderX);
                 jsonObject.put("y", "" + posRenderY);
                 jsonObject.put("width", "" + posRenderWidth);

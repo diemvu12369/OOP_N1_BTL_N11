@@ -24,7 +24,7 @@ public class Bomber extends MovingObject {
         return maxBomb;
     }
 
-    public void changeMaxBomb(int value) {
+    public void modifyMaxBomb(int value) {
         this.maxBomb += value;
     }
 
@@ -37,7 +37,7 @@ public class Bomber extends MovingObject {
         return flameLength;
     }
 
-    public void changeFlameLength(int value) {
+    public void modifyFlameLength(int value) {
         this.flameLength += value;
     }
 
@@ -50,19 +50,19 @@ public class Bomber extends MovingObject {
         return currentBomb;
     }
 
-    public void changeCurrentBomb(int value) {
+    public void modifyCurrentBomb(int value) {
         this.currentBomb += value;
     }
 
     /**
      * Constructor cho Bomber.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      */
-    public Bomber(PlayGround belongTo, double x, double y) {
-        super(belongTo, x, y, 35, 35); // Kích thước mặc định
+    public Bomber(PlayGround correspondingPlayGround, double x, double y) {
+        super(correspondingPlayGround, x, y, 35, 35); // Kích thước mặc định
 
         setSpeed(3);
     }
@@ -70,14 +70,14 @@ public class Bomber extends MovingObject {
     /**
      * Constructor cho Bomber.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tạo độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Bomber(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Bomber(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
 
         setSpeed(3);
     }
@@ -87,51 +87,51 @@ public class Bomber extends MovingObject {
      *
      * @return có hoặc không
      */
-    public boolean canCreateBomb() {
+    public boolean canPlaceBomb() {
         return currentBomb < maxBomb;
     }
 
     /**
      * Tạo bomb.
      */
-    public void createBomb() {
-        if (!canCreateBomb()) {
+    public void placeBomb() {
+        if (!canPlaceBomb()) {
             return;
         }
         SoundVariable.playSound(FilesPath.PlaceBombAudio);
         int tempX = (int) ((GameVariables.calculateCellIndex(this.getX() + this.getWidth() / 2))
-                * GameVariables.cellLength);
+                * GameVariables.unitLength);
 
         int tempY = (int) ((GameVariables.calculateCellIndex(this.getY() + this.getLength() / 2))
-                * GameVariables.cellLength);
+                * GameVariables.unitLength);
 
         currentBomb++;
 
-        this.getBelongTo().addBomb(new Bomb(this.getBelongTo(), tempX, tempY, GameVariables.cellLength, GameVariables.cellLength, this));
+        this.getCorrespondingPlayGround().addBomb(new Bomb(this.getCorrespondingPlayGround(), tempX, tempY, GameVariables.unitLength, GameVariables.unitLength, this));
     }
 
     /**
      * Kiểm tra trên phạm vi đang đứng có item không, nếu có thì thực hiện ăn.
      */
     public void checkEatItems() {
-        int x1 = GameVariables.calculateCellIndex(this.getX());
-        int x2 = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
-        int y1 = GameVariables.calculateCellIndex(this.getY());
-        int y2 = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
+        int minX = GameVariables.calculateCellIndex(this.getX());
+        int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
+        int minY = GameVariables.calculateCellIndex(this.getY());
+        int maxY = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
 
-        for (int i = y1; i <= y2; i++)
-            for (int j = x1; j <= x2; j++) {
-                GameObject now = this.getBelongTo().getCells(i, j);
+        for (int i = minY; i <= maxY; i++)
+            for (int j = minX; j <= maxX; j++) {
+                GameObject currentCell = this.getCorrespondingPlayGround().getCells(i, j);
 
-                if (!(now instanceof Item)) {
+                if (!(currentCell instanceof Item)) {
                     continue;
                 }
 
-                if (!((Item) now).isFinalState() || ((Item) now).getAteStatus()) {
+                if (!((Item) currentCell).isFinalState() || ((Item) currentCell).getAteStatus()) {
                     continue;
                 }
 
-                switch (((Item) now).getType()) {
+                switch (((Item) currentCell).getType()) {
                     case BOMB_ITEM_:
                         maxBomb++;
                         break;
@@ -144,7 +144,7 @@ public class Bomber extends MovingObject {
                 }
 
                 SoundVariable.playSound(FilesPath.PowerUpAudio);
-                ((Item) now).setAteStatus(true);
+                ((Item) currentCell).setAteStatus(true);
             }
     }
 
@@ -154,26 +154,26 @@ public class Bomber extends MovingObject {
      * @return có đứng trên hoặc không
      */
     public boolean checkOnPortal() {
-        int x1 = GameVariables.calculateCellIndex(this.getX());
-        int x2 = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
-        int y1 = GameVariables.calculateCellIndex(this.getY());
-        int y2 = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
+        int minX = GameVariables.calculateCellIndex(this.getX());
+        int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
+        int minY = GameVariables.calculateCellIndex(this.getY());
+        int maxY = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
 
-        for (int i = y1; i <= y2; i++)
-            for (int j = x1; j <= x2; j++) {
-                GameObject now = this.getBelongTo().getCells(i, j);
+        for (int i = minY; i <= maxY; i++)
+            for (int j = minX; j <= maxX; j++) {
+                GameObject currentCell = this.getCorrespondingPlayGround().getCells(i, j);
 
-                if (!(now instanceof Portal)) {
+                if (!(currentCell instanceof Portal)) {
                     return false;
                 }
 
-                if (((Portal) now).isFinalState()) return true;
+                if (((Portal) currentCell).isFinalState()) return true;
             }
 
         return false;
     }
 
-    public void die() {
+    public void dead() {
         SoundVariable.playSound(FilesPath.BomberDieAudio);
     }
 

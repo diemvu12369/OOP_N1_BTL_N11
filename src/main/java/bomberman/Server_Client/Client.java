@@ -117,7 +117,7 @@ public class Client {
         if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.RIGHT_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.RIGHT_);
                 jsonObject.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -125,7 +125,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.LEFT_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.LEFT_);
                 jsonObject.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -133,7 +133,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.UP_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.UP_);
                 jsonObject.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -141,7 +141,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.DOWN_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.DOWN_);
                 jsonObject.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -173,7 +173,7 @@ public class Client {
         if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.RIGHT_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.RIGHT_);
                 jsonObject.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -181,7 +181,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.LEFT_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.LEFT_);
                 jsonObject.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -189,7 +189,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.UP_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.UP_);
                 jsonObject.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -197,7 +197,7 @@ public class Client {
         } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
             try {
                 jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.ObjectDirection.DOWN_);
+                jsonObject.put("direction", MovingObject.DirectionOfObject.DOWN_);
                 jsonObject.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
@@ -228,7 +228,7 @@ public class Client {
                         double length = Double.parseDouble((String) object.get("length"));
 
                         RenderVariable.gc.drawImage(
-                                FilesPath.decodeImageName((String) object.get("Image")),
+                                FilesPath.getNameImageBased((String) object.get("Image")),
                                 x,
                                 y,
                                 width,
@@ -243,7 +243,7 @@ public class Client {
                         double length = Double.parseDouble((String) object.get("length"));
 
                         RenderVariable.gc.drawImage(
-                                FilesPath.decodeImageName((String) object.get("Image")),
+                                FilesPath.getNameImageBased((String) object.get("Image")),
                                 x,
                                 y,
                                 width,
@@ -259,18 +259,18 @@ public class Client {
 
                     double imageX = Double.parseDouble((String) object.get("imageX"));
                     double imageY = Double.parseDouble((String) object.get("imageY"));
-                    double imageWidth = Double.parseDouble((String) object.get("imageWidth"));
-                    double imageLength = Double.parseDouble((String) object.get("imageLength"));
+                    double widthOfImage = Double.parseDouble((String) object.get("widthOfImage"));
+                    double lengthOfImage = Double.parseDouble((String) object.get("lengthOfImage"));
                     double x = Double.parseDouble((String) object.get("x"));
                     double y = Double.parseDouble((String) object.get("y"));
                     double width = Double.parseDouble((String) object.get("width"));
                     double length = Double.parseDouble((String) object.get("length"));
                     RenderVariable.gc.drawImage(
-                            FilesPath.decodeImageName((String) object.get("Image")),
+                            FilesPath.getNameImageBased((String) object.get("Image")),
                             imageX,
                             imageY,
-                            imageWidth,
-                            imageLength,
+                            widthOfImage,
+                            lengthOfImage,
                             x,
                             y,
                             width,
@@ -282,11 +282,11 @@ public class Client {
                     String audioMode = (String) object.get("Mode");
 
                     if (audioMode.equals("Play")) {
-                        Clip tempSound = FilesPath.decodeClipName((String) object.get("Audio"));
+                        Clip tempSound = FilesPath.getNameClipBased((String) object.get("Audio"));
 
                         SoundVariable.playSoundOnly(tempSound);
                     } else if (audioMode.equals("Loop")) {
-                        Clip tempSound = FilesPath.decodeClipName((String) object.get("Audio"));
+                        Clip tempSound = FilesPath.getNameClipBased((String) object.get("Audio"));
 
                         int tempTime = Integer.parseInt((String) object.get("Time"));
 

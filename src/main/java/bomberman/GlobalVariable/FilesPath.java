@@ -12,11 +12,11 @@ public class FilesPath {
      * @param path đường dẫn của ảnh
      * @return đối tượng Image mới
      */
-    private static Image createImage(String path) {
+    private static Image initializeImage(String path) {
         return new Image(String.valueOf(FilesPath.class.getResource(path)));
     }
 
-    public static Clip createClip(String filePath) {
+    public static Clip initializeClip(String filePath) {
         filePath = "/sound/" + filePath;
 
         try {
@@ -32,63 +32,63 @@ public class FilesPath {
     }
 
     // IMAGE FILE PATH
-    public static final Image BackGroundGame = createImage("/image/background_game.png");
+    public static final Image BackGroundGame = initializeImage("/image/background_game.png");
 
-    public static final Image Bomber = createImage("/image/bomber.png");
+    public static final Image Bomber = initializeImage("/image/bomber.png");
 
-    public static final Image Bomb = createImage("/image/bomb.png");
+    public static final Image Bomb = initializeImage("/image/bomb.png");
 
-    public static final Image Oneal = createImage("/image/oneal.png");
-    public static final Image Balloom = createImage("/image/balloom.png");
-    public static final Image Teleport = createImage("/image/teleport.png");
+    public static final Image Oneal = initializeImage("/image/oneal.png");
+    public static final Image Balloom = initializeImage("/image/balloom.png");
+    public static final Image Teleport = initializeImage("/image/teleport.png");
 
-    public static final Image Grass = createImage("/image/grass.png");
-    public static final Image Wall = createImage("/image/wall.png");
-    public static final Image Portal = createImage("/image/portal.png");
-    public static final Image Brick = createImage("/image/brick.png");
-    public static final Image BrickExploded = createImage("/image/brick_exploded.png");
+    public static final Image Grass = initializeImage("/image/grass.png");
+    public static final Image Wall = initializeImage("/image/wall.png");
+    public static final Image Portal = initializeImage("/image/portal.png");
+    public static final Image Brick = initializeImage("/image/brick.png");
+    public static final Image BrickExploded = initializeImage("/image/brick_exploded.png");
 
-    public static final Image Flame = createImage("/image/flame.png");
+    public static final Image Flame = initializeImage("/image/flame.png");
 
-    public static final Image PowerUpBomb = createImage("/image/power_up_bomb.png");
-    public static final Image PowerUpFlame = createImage("/image/power_up_flame.png");
-    public static final Image PowerUpSpeed = createImage("/image/power_up_speed.png");
+    public static final Image PowerUpBomb = initializeImage("/image/power_up_bomb.png");
+    public static final Image PowerUpFlame = initializeImage("/image/power_up_flame.png");
+    public static final Image PowerUpSpeed = initializeImage("/image/power_up_speed.png");
 
-    public static final Image LevelUp = createImage("/image/level_up.png");
-    public static final Image YouWon = createImage("/image/you_won.png");
-    public static final Image YouLose = createImage("/image/you_lose.png");
-    public static final Image YouDraw = createImage("/image/you_draw.png");
+    public static final Image LevelUp = initializeImage("/image/level_up.png");
+    public static final Image YouWon = initializeImage("/image/you_won.png");
+    public static final Image YouLose = initializeImage("/image/you_lose.png");
+    public static final Image YouDraw = initializeImage("/image/you_draw.png");
 
-    public static final Image BackMenu = createImage("/image/back_menu.png");
-    public static final Image Sound = createImage("/image/sound.png");
-    public static final Image SoundOff = createImage("/image/sound_off.png");
+    public static final Image BackMenu = initializeImage("/image/back_menu.png");
+    public static final Image Sound = initializeImage("/image/sound.png");
+    public static final Image SoundOff = initializeImage("/image/sound_off.png");
 
     // MAP FILE PATH
     public static final String PVB_MAP_PATH = "/map/map.txt";
     public static final String PVP_MAP_PATH = "/map/pvp_map.txt";
 
     // AUDIO CLIP FILE PATH
-    public static Clip BomberDieAudio = createClip("bomber_die.wav");
-    public static Clip BalloomDieAudio = createClip("balloom_die.wav");
-    public static Clip OnealDieAudio = createClip("oneal_die.wav");
-    public static Clip TeleportDieAudio = createClip("teleport_die.wav");
+    public static Clip BomberDieAudio = initializeClip("bomber_die.wav");
+    public static Clip BalloomDieAudio = initializeClip("balloom_die.wav");
+    public static Clip OnealDieAudio = initializeClip("oneal_die.wav");
+    public static Clip TeleportDieAudio = initializeClip("teleport_die.wav");
 
-    public static Clip ExplosionAudio = createClip("explosion.wav");
-    public static Clip PlaceBombAudio = createClip("place_bomb.wav");
-    public static Clip ItemAppearsAudio = createClip("item_appears.wav");
-    public static Clip PowerUpAudio = createClip("power_up.wav");
+    public static Clip ExplosionAudio = initializeClip("explosion.wav");
+    public static Clip PlaceBombAudio = initializeClip("place_bomb.wav");
+    public static Clip ItemAppearsAudio = initializeClip("item_appears.wav");
+    public static Clip PowerUpAudio = initializeClip("power_up.wav");
 
-    public static Clip LevelUpAudio = createClip("level_up.wav");
-    public static Clip YouWonAudio = createClip("you_won.wav");
-    public static Clip YouLoseAudio = createClip("you_lose.wav");
+    public static Clip LevelUpAudio = initializeClip("level_up.wav");
+    public static Clip YouWonAudio = initializeClip("you_won.wav");
+    public static Clip YouLoseAudio = initializeClip("you_lose.wav");
 
-    public static Clip PlayGroundAudio = createClip("play_ground.wav");
+    public static Clip PlayGroundAudio = initializeClip("play_ground.wav");
 
     public FilesPath() throws URISyntaxException {
     }
 
     // TODO: optimize this
-    public static String encodeImageName(Image tmp) {
+    public static String getImageName(Image tmp) {
         if (Bomber.equals(tmp)) {
             return "Bomber";
         } else if (Grass.equals(tmp)) {
@@ -126,7 +126,7 @@ public class FilesPath {
         return "UNKNOWN";
     }
 
-    public static Image decodeImageName(String name) {
+    public static Image getNameImageBased(String name) {
         switch (name) {
             case "Bomber":
                 return Bomber;
@@ -167,7 +167,7 @@ public class FilesPath {
         return Grass;
     }
 
-    public static String encodeClipName(Clip tmp) {
+    public static String getClipName(Clip tmp) {
         if (BomberDieAudio.equals(tmp)) {
             return "BomberDieAudio";
         } else if (BalloomDieAudio.equals(tmp)) {
@@ -197,7 +197,7 @@ public class FilesPath {
         return "UNKNOWN";
     }
 
-    public static Clip decodeClipName(String name) {
+    public static Clip getNameClipBased(String name) {
         switch (name) {
             case "BomberDieAudio":
                 return BomberDieAudio;

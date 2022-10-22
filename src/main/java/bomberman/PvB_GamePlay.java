@@ -19,7 +19,7 @@ public class PvB_GamePlay {
     /**
      * Trạng thái game (đang chơi, thắng, thua).
      */
-    public enum gameStatusType {
+    public enum typeOfGameStatus {
         PLAYING_,
         WON_,
         LOSE_
@@ -28,13 +28,13 @@ public class PvB_GamePlay {
     /**
      * Trạng thái game hiện tại.
      */
-    private gameStatusType gameStatus;
+    private typeOfGameStatus gameStatus;
 
-    public void setGameStatus(gameStatusType inputGameStatus) {
+    public void setGameStatus(typeOfGameStatus inputGameStatus) {
         gameStatus = inputGameStatus;
     }
 
-    public gameStatusType getGameStatus() {
+    public typeOfGameStatus getGameStatus() {
         return gameStatus;
     }
 
@@ -100,10 +100,10 @@ public class PvB_GamePlay {
 
         player = null;
 
-        map.clearPlayers();
-        map.clearEnemies();
-        map.clearBombs();
-        map.clearFlames();
+        map.resetPlayers();
+        map.resetEnemies();
+        map.resetBombs();
+        map.resetFlames();
 
         map.createMapAtLevel();
 
@@ -125,7 +125,7 @@ public class PvB_GamePlay {
         } while (System.nanoTime() - startTime <= 750000000);
         SoundVariable.endAllSounds();
         SoundVariable.playSound(FilesPath.YouLoseAudio);
-        gameStatus = gameStatusType.LOSE_;
+        gameStatus = typeOfGameStatus.LOSE_;
     }
 
     /**
@@ -143,7 +143,7 @@ public class PvB_GamePlay {
         } while (System.nanoTime() - startTime <= 750000000);
         SoundVariable.endAllSounds();
         SoundVariable.playSound(FilesPath.YouWonAudio);
-        gameStatus = gameStatusType.WON_;
+        gameStatus = typeOfGameStatus.WON_;
     }
 
     /**
@@ -164,7 +164,7 @@ public class PvB_GamePlay {
         for (Flame flame : map.getFlames()) {
             // nếu flame chạm nhân vật
             if (flame.checkIntersect(player)) {
-                player.die();
+                player.dead();
                 gameOver();
 
                 return;
@@ -173,7 +173,7 @@ public class PvB_GamePlay {
             // nếu flame chạm quái
             for (int j = 0; j < map.getEnemies().size(); j++) {
                 if (flame.checkIntersect(map.getEnemies().get(j))) {
-                    map.getEnemies().get(j).die();
+                    map.getEnemies().get(j).dead();
                     map.removeEnemy(j);
 
                     j--;
@@ -184,7 +184,7 @@ public class PvB_GamePlay {
         for (Enemy enemy : map.getEnemies()) {
             // quái chạm nhân vật
             if (enemy.checkIntersect(player) && enemy.getType() == 1) {
-                player.die();
+                player.dead();
                 gameOver();
 
                 return;
@@ -200,27 +200,27 @@ public class PvB_GamePlay {
         //cập nhật trạng thái của bản đồ
         for (int i = 0; i < map.getNumberOfRow(); i++) {
             for (int j = 0; j < map.getNumberOfColumn(); j++) {
-                GameObject now = map.getCells(i, j);
+                GameObject currentCell = map.getCells(i, j);
 
                 //hủy những ô brick đã hết thời gian nổ
-                if (now instanceof Brick) {
-                    if (((Brick) now).checkExplodingExpired()) {
-                        ((Brick) now).setBlockState(Block.BlockState.FINAL_STATE_);
+                if (currentCell instanceof Brick) {
+                    if (((Brick) currentCell).checkExplodingExpired()) {
+                        ((Brick) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
                     }
                 }
 
                 //hủy những ô item đã hết thời gian nổ
-                if (now instanceof Item) {
-                    if (((Item) now).checkExplodingExpired()) {
+                if (currentCell instanceof Item) {
+                    if (((Item) currentCell).checkExplodingExpired()) {
                         SoundVariable.playSound(FilesPath.ItemAppearsAudio);
-                        ((Item) now).setBlockState(Block.BlockState.FINAL_STATE_);
+                        ((Item) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
                     }
                 }
 
                 //hủy những ô portal đã hết thời gian nổ
-                if (now instanceof Portal) {
-                    if (((Portal) now).checkExplodingExpired()) {
-                        ((Portal) now).setBlockState(Block.BlockState.FINAL_STATE_);
+                if (currentCell instanceof Portal) {
+                    if (((Portal) currentCell).checkExplodingExpired()) {
+                        ((Portal) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
                     }
                 }
             }
@@ -231,7 +231,7 @@ public class PvB_GamePlay {
             if (map.getBombs().get(i).checkExplode()) {
                 map.getBombs().get(i).detonateBomb();
 
-                map.getBombs().get(i).getOwner().changeCurrentBomb(-1);
+                map.getBombs().get(i).getOwner().modifyCurrentBomb(-1);
 
                 map.removeBomb(i);
 
@@ -253,7 +253,7 @@ public class PvB_GamePlay {
                     if (map.getFlames().get(i).checkIntersect(map.getBombs().get(j))) {
                         map.getBombs().get(j).detonateBomb();
 
-                        map.getBombs().get(j).getOwner().changeCurrentBomb(-1);
+                        map.getBombs().get(j).getOwner().modifyCurrentBomb(-1);
 
                         map.removeBomb(j);
 
@@ -282,16 +282,16 @@ public class PvB_GamePlay {
      */
     public void inputKeyPress(KeyEvent e) {
         if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
-            player.setObjectDirection(MovingObject.ObjectDirection.RIGHT_, true);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, true);
         } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
-            player.setObjectDirection(MovingObject.ObjectDirection.LEFT_, true);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, true);
         } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
-            player.setObjectDirection(MovingObject.ObjectDirection.UP_, true);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.UP_, true);
         } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
-            player.setObjectDirection(MovingObject.ObjectDirection.DOWN_, true);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, true);
         } else if (e.getCode() == KeyCode.SPACE) {
-            if (player.canCreateBomb()) {
-                player.createBomb();
+            if (player.canPlaceBomb()) {
+                player.placeBomb();
             }
         }
     }
@@ -303,13 +303,13 @@ public class PvB_GamePlay {
      */
     public void inputKeyRelease(KeyEvent e) {
         if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
-            player.setObjectDirection(MovingObject.ObjectDirection.RIGHT_, false);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, false);
         } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
-            player.setObjectDirection(MovingObject.ObjectDirection.LEFT_, false);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, false);
         } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
-            player.setObjectDirection(MovingObject.ObjectDirection.UP_, false);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.UP_, false);
         } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
-            player.setObjectDirection(MovingObject.ObjectDirection.DOWN_, false);
+            player.setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, false);
         }
     }
 }

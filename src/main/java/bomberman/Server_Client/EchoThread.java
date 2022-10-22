@@ -52,7 +52,7 @@ public class EchoThread extends Thread {
                     }
                 } else {
                     // Nếu là yêu cầu thao tác nhân vật, xử lý yêu cầu đó
-                    GameVariables.PvP_Mode.decodePlayerCommand(line);
+                    GameVariables.PvP.decodePlayerCommand(line);
                 }
             } catch (SocketException e) {
                 if (LANVariables.server.serverSocket.isClosed())

@@ -15,16 +15,16 @@ public abstract class MovingObject extends GameObject {
     /**
      * Constructor cho Moving Object.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public MovingObject(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public MovingObject(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
 
-        setObjectDirection(ObjectDirection.NONE_, true);
+        setDirectionOfObject(DirectionOfObject.NONE_, true);
 
         currentState = ObjectMovementState.HORIZONTAL_;
     }
@@ -34,7 +34,7 @@ public abstract class MovingObject extends GameObject {
     /**
      * Hướng di chuyển của object.
      */
-    public enum ObjectDirection {
+    public enum DirectionOfObject {
         LEFT_,
         RIGHT_,
         UP_,
@@ -45,27 +45,27 @@ public abstract class MovingObject extends GameObject {
     /**
      * Hàng chờ hướng di chuyển.
      */
-    private ArrayList<ObjectDirection> queueDirection = new ArrayList<>();
+    private ArrayList<DirectionOfObject> directionQueue = new ArrayList<>();
 
     /**
      * Trạng thái hiện tại.
      */
-    private ObjectDirection currentDirection;
+    private DirectionOfObject currentDirection;
 
     /**
      * Set hướng di chuyển cho object.
      *
-     * @param objectDirection hướng di chuyển
+     * @param directionOfObject hướng di chuyển
      * @param tempDirection   trạng thái có hoặc không
      */
-    public void setObjectDirection(ObjectDirection objectDirection, boolean tempDirection) {
-        queueDirection.remove(objectDirection);
+    public void setDirectionOfObject(DirectionOfObject directionOfObject, boolean tempDirection) {
+        directionQueue.remove(directionOfObject);
 
         if (tempDirection) {
-            queueDirection.add(objectDirection);
+            directionQueue.add(directionOfObject);
         }
 
-        currentDirection = queueDirection.get(queueDirection.size() - 1);
+        currentDirection = directionQueue.get(directionQueue.size() - 1);
     }
 
     /**
@@ -132,30 +132,30 @@ public abstract class MovingObject extends GameObject {
     /**
      * Kiểm tra xem có thể đứng ở vị trí hiện tại không.
      *
-     * @param temp_x tạo độ trái trên x
-     * @param temp_y tọa độ trái trên y
+     * @param current_x tạo độ trái trên x
+     * @param current_y tọa độ trái trên y
      * @return có hoặc không đứng được
      */
-    boolean checkCanMove(double temp_x, double temp_y) {
-        int x1 = GameVariables.calculateCellIndex(temp_x);
-        int x2 = GameVariables.calculateCellIndex(temp_x + this.getWidth() - 1);
-        int y1 = GameVariables.calculateCellIndex(temp_y);
-        int y2 = GameVariables.calculateCellIndex(temp_y + this.getLength() - 1);
+    boolean checkCanMove(double current_x, double current_y) {
+        int minX = GameVariables.calculateCellIndex(current_x);
+        int maxX = GameVariables.calculateCellIndex(current_x + this.getWidth() - 1);
+        int minY = GameVariables.calculateCellIndex(current_y);
+        int maxY = GameVariables.calculateCellIndex(current_y + this.getLength() - 1);
 
         //gặp bomb
-        for (Bomb bomb : this.getBelongTo().getBombs()) {
-            if (bomb.checkIntersect(temp_x, temp_x + this.getWidth() - 1,
-                    temp_y, temp_y + this.getLength() - 1) &&
+        for (Bomb bomb : this.getCorrespondingPlayGround().getBombs()) {
+            if (bomb.checkIntersect(current_x, current_x + this.getWidth() - 1,
+                    current_y, current_y + this.getLength() - 1) &&
                     bomb.checkBlockStatusWithObject(this)) {
                 return false;
             }
         }
 
         //đứng ở ô không cho phép
-        return !this.getBelongTo().isBlockCell(y1, x1) &&
-                !this.getBelongTo().isBlockCell(y1, x2) &&
-                !this.getBelongTo().isBlockCell(y2, x1) &&
-                !this.getBelongTo().isBlockCell(y2, x2);
+        return !this.getCorrespondingPlayGround().isCellBlocked(minY, minX) &&
+                !this.getCorrespondingPlayGround().isCellBlocked(minY, maxX) &&
+                !this.getCorrespondingPlayGround().isCellBlocked(maxY, minX) &&
+                !this.getCorrespondingPlayGround().isCellBlocked(maxY, maxX);
     }
 
     /**
@@ -168,43 +168,43 @@ public abstract class MovingObject extends GameObject {
             return;
         }
 
-        double cellLength = GameVariables.cellLength;
+        double unitLength = GameVariables.unitLength;
 
-        double nowX = getX();
-        double nowY = getY();
+        double currentX = getX();
+        double currentY = getY();
 
         //Biến này cộng vào tọa độ để object luôn nằm giữa cell.
-        double adjustPosition = (cellLength - this.getLength()) / 2;
+        double adjustPosition = (unitLength - this.getLength()) / 2;
 
         if (currentState == ObjectMovementState.HORIZONTAL_) {
-            if (currentDirection == ObjectDirection.LEFT_ || currentDirection == ObjectDirection.RIGHT_) {
-                if (deltaX != 0 && checkCanMove(nowX + deltaX, nowY)) {
-                    setX(nowX + deltaX);
+            if (currentDirection == DirectionOfObject.LEFT_ || currentDirection == DirectionOfObject.RIGHT_) {
+                if (deltaX != 0 && checkCanMove(currentX + deltaX, currentY)) {
+                    setX(currentX + deltaX);
                 }
-            } else if (currentDirection == ObjectDirection.UP_ || currentDirection == ObjectDirection.DOWN_) {
-                int temp_x = GameVariables.calculateCellIndex(this.getCenterX());
+            } else if (currentDirection == DirectionOfObject.UP_ || currentDirection == DirectionOfObject.DOWN_) {
+                int current_x = GameVariables.calculateCellIndex(this.getCenterX());
 
-                double newPositionX = temp_x * cellLength + adjustPosition;
+                double newPositionX = current_x * unitLength + adjustPosition;
 
-                if (deltaY != 0 && checkCanMove(newPositionX, nowY + cellLength * (deltaY > 0 ? 1 : -1))) {
+                if (deltaY != 0 && checkCanMove(newPositionX, currentY + unitLength * (deltaY > 0 ? 1 : -1))) {
                     setX(newPositionX);
-                    setY(nowY + deltaY);
+                    setY(currentY + deltaY);
 
                     currentState = ObjectMovementState.VERTICAL_;
                 }
             }
         } else if (currentState == ObjectMovementState.VERTICAL_) {
-            if (currentDirection == ObjectDirection.UP_ || currentDirection == ObjectDirection.DOWN_) {
-                if (deltaY != 0 && checkCanMove(nowX, nowY + deltaY)) {
-                    setY(nowY + deltaY);
+            if (currentDirection == DirectionOfObject.UP_ || currentDirection == DirectionOfObject.DOWN_) {
+                if (deltaY != 0 && checkCanMove(currentX, currentY + deltaY)) {
+                    setY(currentY + deltaY);
                 }
-            } else if (currentDirection == ObjectDirection.LEFT_ || currentDirection == ObjectDirection.RIGHT_) {
-                int temp_y = GameVariables.calculateCellIndex(this.getCenterY());
+            } else if (currentDirection == DirectionOfObject.LEFT_ || currentDirection == DirectionOfObject.RIGHT_) {
+                int current_y = GameVariables.calculateCellIndex(this.getCenterY());
 
-                double newPositionY = temp_y * cellLength + adjustPosition;
+                double newPositionY = current_y * unitLength + adjustPosition;
 
-                if (deltaX != 0 && checkCanMove(nowX + cellLength * (deltaX > 0 ? 1 : -1), newPositionY)) {
-                    setX(nowX + deltaX);
+                if (deltaX != 0 && checkCanMove(currentX + unitLength * (deltaX > 0 ? 1 : -1), newPositionY)) {
+                    setX(currentX + deltaX);
                     setY(newPositionY);
 
                     currentState = ObjectMovementState.HORIZONTAL_;
@@ -215,21 +215,21 @@ public abstract class MovingObject extends GameObject {
 
     // *************************** GRAPHIC **********************************************************
 
-    ObjectDirection lastDirection = ObjectDirection.LEFT_;
+    DirectionOfObject lastDirection = DirectionOfObject.LEFT_;
 
     /**
      * Chỉ số direction để tính được renderY cho image.
      */
     private int getYByDirection() {
-        if (lastDirection == ObjectDirection.UP_) {
+        if (lastDirection == DirectionOfObject.UP_) {
             return 0;
         }
 
-        if (lastDirection == ObjectDirection.DOWN_) {
+        if (lastDirection == DirectionOfObject.DOWN_) {
             return 1;
         }
 
-        if (lastDirection == ObjectDirection.LEFT_) {
+        if (lastDirection == DirectionOfObject.LEFT_) {
             return 2;
         }
 
@@ -239,7 +239,7 @@ public abstract class MovingObject extends GameObject {
     @Override
     public void draw() {
         // Tính lastDirection
-        if (currentDirection != ObjectDirection.NONE_) {
+        if (currentDirection != DirectionOfObject.NONE_) {
             lastDirection = currentDirection;
         }
 
@@ -247,18 +247,18 @@ public abstract class MovingObject extends GameObject {
         Image currentImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double imageWidth = currentImage.getHeight();
-        double imageLength = currentImage.getWidth();
+        double widthOfImage = currentImage.getHeight();
+        double lengthOfImage = currentImage.getWidth();
 
-        double spriteSize = imageWidth / 4;
+        double sizeOfSprite = widthOfImage / 4;
 
-        numberOfSprite = (int) (imageLength / spriteSize) - 1;
+        numberOfSprite = (int) (lengthOfImage / sizeOfSprite) - 1;
 
         // Tính toán thông tin render
         double renderX;
-        double renderY = getYByDirection() * spriteSize;
+        double renderY = getYByDirection() * sizeOfSprite;
 
-        if (currentDirection == ObjectDirection.NONE_) {
+        if (currentDirection == DirectionOfObject.NONE_) {
             renderX = 0;
 
             resetFrameCount();
@@ -272,12 +272,12 @@ public abstract class MovingObject extends GameObject {
 
             gameFrameCount++;
 
-            renderX = (currentSprite + 1) * spriteSize;
+            renderX = (currentSprite + 1) * sizeOfSprite;
         }
 
         // Render
         setPosRender(0, 0, 0, 0);
 
-        render(currentImage, renderX, renderY, spriteSize, spriteSize);
+        render(currentImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
     }
 }

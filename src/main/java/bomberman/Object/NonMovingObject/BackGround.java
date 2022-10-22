@@ -10,10 +10,10 @@ public class BackGround extends GameObject {
     /**
      * Constructor cho BackGround.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      */
-    public BackGround(PlayGround belongTo) {
-        super(belongTo, 0, 0, RenderVariable.SCREEN_LENGTH, RenderVariable.SCREEN_WIDTH);
+    public BackGround(PlayGround correspondingPlayGround) {
+        super(correspondingPlayGround, 0, 0, RenderVariable.SCREEN_LENGTH, RenderVariable.SCREEN_WIDTH);
     }
 
     @Override

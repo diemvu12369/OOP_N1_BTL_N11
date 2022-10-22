@@ -41,28 +41,28 @@ public class Flame extends GameObject {
     /**
      * Constructor cho flame.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Flame(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Flame(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
     }
 
     /**
      * Constructor cho flame.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      * @param type     loại của flame
      */
-    public Flame(PlayGround belongTo, double x, double y, double width, double length, FlameType type) {
-        super(belongTo, x, y, width, length);
+    public Flame(PlayGround correspondingPlayGround, double x, double y, double width, double length, FlameType type) {
+        super(correspondingPlayGround, x, y, width, length);
 
         this.type = type;
 
@@ -99,14 +99,14 @@ public class Flame extends GameObject {
      * Check xem ô nào bị nổ.
      */
     public void checkIntersectCells() {
-        int x1 = GameVariables.calculateCellIndex(this.getX());
-        int x2 = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
-        int y1 = GameVariables.calculateCellIndex(this.getY());
-        int y2 = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
+        int minX = GameVariables.calculateCellIndex(this.getX());
+        int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
+        int minY = GameVariables.calculateCellIndex(this.getY());
+        int maxY = GameVariables.calculateCellIndex(this.getY() + this.getLength() - 1);
 
-        for (int i = y1; i <= y2; i++)
-            for (int j = x1; j <= x2; j++) {
-                handleIntersectCell(this.getBelongTo().getCells(i, j));
+        for (int i = minY; i <= maxY; i++)
+            for (int j = minX; j <= maxX; j++) {
+                handleIntersectCell(this.getCorrespondingPlayGround().getCells(i, j));
             }
     }
 
@@ -134,12 +134,12 @@ public class Flame extends GameObject {
         Image currentImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double imageWidth = currentImage.getHeight();
-        double imageLength = currentImage.getWidth();
+        double widthOfImage = currentImage.getHeight();
+        double lengthOfImage = currentImage.getWidth();
 
-        double spriteSize = imageWidth / 5;
+        double sizeOfSprite = widthOfImage / 5;
 
-        numberOfSprite = (int) (imageLength / spriteSize);
+        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
         if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
@@ -153,7 +153,7 @@ public class Flame extends GameObject {
         // Render
         setPosRender(0, 0, 0, 0);
 
-        double renderX = currentSprite * spriteSize;
+        double renderX = currentSprite * sizeOfSprite;
         double renderY;
 
         switch (type) {
@@ -174,8 +174,8 @@ public class Flame extends GameObject {
                 break;
         }
 
-        renderY *= spriteSize;
+        renderY *= sizeOfSprite;
 
-        render(currentImage, renderX, renderY, spriteSize, spriteSize);
+        render(currentImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
     }
 }

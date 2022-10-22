@@ -15,26 +15,26 @@ public class Teleport extends Enemy {
     /**
      * Constructor cho Teleport.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Teleport(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Teleport(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
         this.setType(2);
     }
 
     /**
      * Constructor cho Teleport.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      */
-    public Teleport(PlayGround belongTo, double x, double y) {
-        super(belongTo, x, y);
+    public Teleport(PlayGround correspondingPlayGround, double x, double y) {
+        super(correspondingPlayGround, x, y);
         this.setType(2);
     }
 
@@ -48,31 +48,31 @@ public class Teleport extends Enemy {
         setNumberOfFramePerSprite(6);
     }
 
-    public void die() {
+    public void dead() {
         SoundVariable.playSound(FilesPath.TeleportDieAudio);
     }
 
     @Override
     public void move() {
-        if (this.checkIntersect(this.getBelongTo().getPlayers().get(0))) {
+        if (this.checkIntersect(this.getCorrespondingPlayGround().getPlayers().get(0))) {
             int cnt = 0;
             Map<Integer, Pair <Integer, Integer> > map = new HashMap<Integer, Pair <Integer, Integer> >();
             for (int i = 0; i < PvB_GamePlay.map.getNumberOfRow(); i++) {
                 for (int j = 0; j < PvB_GamePlay.map.getNumberOfColumn(); j++) {
-                    if (!this.getBelongTo().isBlockCell(i, j) && !this.getBelongTo().getStateBomb(i, j)) {
+                    if (!this.getCorrespondingPlayGround().isCellBlocked(i, j) && !this.getCorrespondingPlayGround().getBombState(i, j)) {
                         cnt++;
                         Pair <Integer, Integer> p = new Pair<>(i, j);
                         map.put(cnt, p);
                     }
                 }
             }
-            double randomDouble = Math.random();
-            randomDouble = randomDouble * 1000 + 1;
-            int randomInt = (int) randomDouble;
+            double randomlyDouble = Math.random();
+            randomlyDouble = randomlyDouble * 1000 + 1;
+            int randomInt = (int) randomlyDouble;
             randomInt = (randomInt % cnt) + 1;
             Pair <Integer, Integer> p = map.get(randomInt);
-            this.getBelongTo().getPlayers().get(0).setX((double) p.getValue() * GameVariables.cellLength);
-            this.getBelongTo().getPlayers().get(0).setY((double) p.getKey() * GameVariables.cellLength);
+            this.getCorrespondingPlayGround().getPlayers().get(0).setX((double) p.getValue() * GameVariables.unitLength);
+            this.getCorrespondingPlayGround().getPlayers().get(0).setY((double) p.getKey() * GameVariables.unitLength);
         }
         super.move();
     }

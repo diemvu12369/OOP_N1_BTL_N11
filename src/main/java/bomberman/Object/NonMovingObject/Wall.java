@@ -24,14 +24,14 @@ public class Wall extends GameObject {
     /**
      * Constructor cho Wall.
      *
-     * @param belongTo tham chiếu tới PlayGround
+     * @param correspondingPlayGround tham chiếu tới PlayGround
      * @param x        tọa độ x
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
      */
-    public Wall(PlayGround belongTo, double x, double y, double width, double length) {
-        super(belongTo, x, y, width, length);
+    public Wall(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
+        super(correspondingPlayGround, x, y, width, length);
 
         Random generator = new Random();
 
@@ -54,11 +54,11 @@ public class Wall extends GameObject {
         Image currentImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double spriteSize = currentImage.getWidth() / numberOfWallType;
+        double sizeOfSprite = currentImage.getWidth() / numberOfWallType;
 
         // Render
         setPosRender(-6, -6, 12, 12);
 
-        render(currentImage, wallType * spriteSize, 0, spriteSize, spriteSize);
+        render(currentImage, wallType * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 }

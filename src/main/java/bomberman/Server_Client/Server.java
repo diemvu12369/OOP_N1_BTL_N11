@@ -36,9 +36,9 @@ public class Server {
         }
         new EchoThread(socket).start();
 
-        GameVariables.PvP_Mode = new PvP_GamePlay();
-        GameVariables.PvP_Mode.play();
+        GameVariables.PvP = new PvP_GamePlay();
+        GameVariables.PvP.play();
         GameVariables.playerRole = GameVariables.role.PLAYER_1;
-        GameVariables.PvP_Mode.setGameStatus(PvP_GamePlay.gameStatusType.PLAYING_);
+        GameVariables.PvP.setGameStatus(PvP_GamePlay.typeOfGameStatus.PLAYING_);
     }
 }
