@@ -10,55 +10,55 @@ import java.net.SocketException;
 public class EchoThread extends Thread {
     protected Socket socket;
 
-    public EchoThread(Socket clientSocket) {
-        this.socket = clientSocket;
+    public EchoThread(Socket socket) {
+        this.socket = socket;
     }
 
     public void run() {
 
-        InputStream inp = null;
-        BufferedReader brinp = null;
-        BufferedWriter out = null;
+        InputStream inputStream = null;
+        BufferedReader bufferedInputStream = null;
+        BufferedWriter outputStream = null;
 
         // khởi tạo luồng vào và ra cho luồng giao tiếp hiện tại
         try {
             socket.setTcpNoDelay(true);
-            inp = socket.getInputStream();
-            brinp = new BufferedReader(new InputStreamReader(inp));
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        } catch (IOException e) {
+            inputStream = socket.getInputStream();
+            bufferedInputStream = new BufferedReader(new InputStreamReader(inputStream));
+            outputStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        } catch (IOException event) {
             return;
         }
 
-        String line;
+        String command;
         while (true) {
 
             // đọc dữ liệu từ client
             try {
-                line = brinp.readLine();
-                if ((line == null) || line.equalsIgnoreCase("QUIT")) {
+                command = bufferedInputStream.readLine();
+                if ((command == null) || command.equalsIgnoreCase("QUIT")) {
                     break;
-                } else if (line.contains("GET")) {
+                } else if (command.contains("GET")) {
                     // Nếu là yêu cầu lấy hình ảnh, gửi các lệnh render cho client
-                    //System.out.println(socket.toString());
+                    //System.outputStream.println(socket.toString());
                     if ((GameVariables.commandList != null) && (GameVariables.commandList.length() > 0)) {
                         String s = GameVariables.commandList.toString() + '\n';
-                        out.write(s);
-                        out.flush();
+                        outputStream.write(s);
+                        outputStream.flush();
                     } else {
                         String s = "NO COMMAND\n";
-                        out.write(s);
-                        out.flush();
+                        outputStream.write(s);
+                        outputStream.flush();
                     }
                 } else {
                     // Nếu là yêu cầu thao tác nhân vật, xử lý yêu cầu đó
-                    GameVariables.PvP.decodePlayerCommand(line);
+                    GameVariables.PvP.executeRenderCommand(command);
                 }
-            } catch (SocketException e) {
+            } catch (SocketException event) {
                 if (LANVariables.server.serverSocket.isClosed())
                     return;
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException event) {
+                event.printStackTrace();
                 return;
             }
         }

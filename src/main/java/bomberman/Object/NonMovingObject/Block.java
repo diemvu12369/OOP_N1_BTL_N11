@@ -17,53 +17,53 @@ public abstract class Block extends GameObject {
      * - Trạng thái đang phát nổ.
      * - Trạng thái cuối cùng.
      */
-    public enum BlockState {
-        INITIAL_STATE_,
-        EXPLODING_STATE_,
-        FINAL_STATE_
+    public enum StateOfBlock {
+        STARTING_STATE_,
+        EXPLODED_STATE_,
+        ENDING_STATE_
     }
 
     /**
      * Trạng thái hiện tại của block.
      */
-    protected BlockState blockState;
+    protected StateOfBlock blockState;
 
     // Image object
-    protected Image INITIAL_STATE_IMAGE = FilesPath.Brick;
-    protected Image EXPLODING_STATE_IMAGE = FilesPath.BrickExploded;
-    protected Image FINAL_STATE_IMAGE;
+    protected Image STARTING_STATE_IMAGE = FilesPath.Brick;
+    protected Image EXPLODED_STATE_IMAGE = FilesPath.BrickExploded;
+    protected Image ENDING_STATE_IMAGE;
 
     /**
      * Thời gian bắt đầu nổ của block.
      */
-    protected long startExplodingTime;
+    protected long plantTime;
 
     /**
      * Thời gian bom nổ.
      */
-    protected final long EXPLOSION_DURATION = 500000000; // 0.5 giây
+    protected final long EXPLODING_DURATION = 500000000; // 0.5 giây
 
-    public long getStartExplodingTime() {
-        return startExplodingTime;
+    public long getExplodeTime() {
+        return plantTime;
     }
 
-    public void setStartExplodingTime(long startExplodingTime) {
-        this.startExplodingTime = startExplodingTime;
+    public void setExplodeTime(long plantTime) {
+        this.plantTime = plantTime;
     }
 
-    public boolean isInitialState() {
-        return blockState == BlockState.INITIAL_STATE_;
+    public boolean isStartingState() {
+        return blockState == StateOfBlock.STARTING_STATE_;
     }
 
-    public boolean isExplodingState() {
-        return blockState == BlockState.EXPLODING_STATE_;
+    public boolean isExplodedState() {
+        return blockState == StateOfBlock.EXPLODED_STATE_;
     }
 
-    public boolean isFinalState() {
-        return blockState == BlockState.FINAL_STATE_;
+    public boolean isEndingState() {
+        return blockState == StateOfBlock.ENDING_STATE_;
     }
 
-    public void setBlockState(BlockState blockState) {
+    public void setStateOfBlock(StateOfBlock blockState) {
         this.blockState = blockState;
     }
 
@@ -79,7 +79,7 @@ public abstract class Block extends GameObject {
     public Block(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
         super(correspondingPlayGround, x, y, width, length);
 
-        blockState = BlockState.INITIAL_STATE_;
+        blockState = StateOfBlock.STARTING_STATE_;
     }
 
     /**
@@ -87,27 +87,27 @@ public abstract class Block extends GameObject {
      *
      * @return chưa hoặc rồi
      */
-    public boolean checkExplodingExpired() {
-        return (isExplodingState() && System.nanoTime() - startExplodingTime >= EXPLOSION_DURATION);
+    public boolean isExplodingExpired() {
+        return (isExplodedState() && System.nanoTime() - plantTime >= EXPLODING_DURATION);
     }
 
     /**
      * Set Image Info for block.
      */
-    public abstract void setFinalStateImageInfo();
+    public abstract void setEndingStateImageInfo();
 
     @Override
     public Image getImage() {
-        setFinalStateImageInfo();
+        setEndingStateImageInfo();
 
-        if (isExplodingState()) {
-            return EXPLODING_STATE_IMAGE;
+        if (isExplodedState()) {
+            return EXPLODED_STATE_IMAGE;
         }
 
-        if (isFinalState()) {
-            return FINAL_STATE_IMAGE;
+        if (isEndingState()) {
+            return ENDING_STATE_IMAGE;
         }
 
-        return INITIAL_STATE_IMAGE;
+        return STARTING_STATE_IMAGE;
     }
 }

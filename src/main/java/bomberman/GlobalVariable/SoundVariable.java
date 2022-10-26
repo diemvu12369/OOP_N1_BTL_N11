@@ -21,15 +21,15 @@ public class SoundVariable {
 
     public static void playSound(Clip clip) {
         if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-            JSONObject jsonObject = new JSONObject();
+            JSONObject json = new JSONObject();
 
             try {
-                jsonObject.put("Audio", FilesPath.getClipName(clip));
-                jsonObject.put("Mode", "Play");
-                GameVariables.tempCommandList.put(jsonObject);
+                json.put("Audio", FilesPath.getClipName(clip));
+                json.put("Mode", "Play");
+                GameVariables.temporaryCommandList.put(json);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException event) {
+                event.printStackTrace();
             }
 
             return;
@@ -52,15 +52,15 @@ public class SoundVariable {
 
     public static void loopSound(Clip clip, int time) {
         if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-            JSONObject jsonObject = new JSONObject();
+            JSONObject json = new JSONObject();
 
             try {
-                jsonObject.put("Audio", FilesPath.getClipName(clip));
-                jsonObject.put("Mode", "Loop");
-                jsonObject.put("Time", "" + time);
-                GameVariables.tempCommandList.put(jsonObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                json.put("Audio", FilesPath.getClipName(clip));
+                json.put("Mode", "Loop");
+                json.put("Time", "" + time);
+                GameVariables.temporaryCommandList.put(json);
+            } catch (JSONException event) {
+                event.printStackTrace();
             }
 
             return;
@@ -102,14 +102,14 @@ public class SoundVariable {
 
     public static void endAllSounds() {
         if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-            JSONObject jsonObject = new JSONObject();
+            JSONObject json = new JSONObject();
 
             try {
-                jsonObject.put("Audio", "Nothing");
-                jsonObject.put("Mode", "EndAllSound");
-                GameVariables.tempCommandList.put(jsonObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                json.put("Audio", "Nothing");
+                json.put("Mode", "EndAllSound");
+                GameVariables.temporaryCommandList.put(json);
+            } catch (JSONException event) {
+                event.printStackTrace();
             }
 
             return;

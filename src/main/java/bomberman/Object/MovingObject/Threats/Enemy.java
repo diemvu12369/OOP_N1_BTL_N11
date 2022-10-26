@@ -15,7 +15,7 @@ public abstract class Enemy extends MovingObject {
      */
     private final long duration = 250000000; // 0.25 giây
 
-    private long startTime = System.nanoTime();
+    private long plantTime = System.nanoTime();
 
     /**
      * Constructor cho Enemy.
@@ -51,7 +51,7 @@ public abstract class Enemy extends MovingObject {
             super.move();
             return;
         }
-        if (System.nanoTime() - startTime >= duration) {
+        if (System.nanoTime() - plantTime >= duration) {
             boolean headingUp, headingRight, headingDown, headingLeft;
 
             headingRight = ThreadLocalRandom.current().nextBoolean();
@@ -72,12 +72,12 @@ public abstract class Enemy extends MovingObject {
                 headingDown = ThreadLocalRandom.current().nextBoolean();
             }
 
-            setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, headingRight);
-            setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, headingLeft);
-            setDirectionOfObject(MovingObject.DirectionOfObject.UP_, headingUp);
-            setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, headingDown);
+            setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT, headingRight);
+            setDirectionOfObject(MovingObject.DirectionOfObject.LEFT, headingLeft);
+            setDirectionOfObject(MovingObject.DirectionOfObject.UP, headingUp);
+            setDirectionOfObject(MovingObject.DirectionOfObject.DOWN, headingDown);
 
-            startTime = System.nanoTime();
+            plantTime = System.nanoTime();
         }
 
         super.move();
@@ -97,28 +97,28 @@ public abstract class Enemy extends MovingObject {
     @Override
     public void draw() {
         // Image hiện tại
-        Image currentImage = getImage();
+        Image displayImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double widthOfImage = currentImage.getHeight();
-        double lengthOfImage = currentImage.getWidth();
+        double widthOfImage = displayImage.getHeight();
+        double lengthOfImage = displayImage.getWidth();
 
         double sizeOfSprite = widthOfImage;
 
-        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
+        spriteNumber = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
-        if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
-            gameFrameCount = gameFrameCount % (numberOfSprite * numberOfFramePerSprite);
+        if (countGameFrame >= (spriteNumber * framePerSprite)) {
+            countGameFrame = countGameFrame % (spriteNumber * framePerSprite);
         }
 
-        currentSprite = gameFrameCount / numberOfFramePerSprite;
+        processingSprite = countGameFrame / framePerSprite;
 
-        gameFrameCount++;
+        countGameFrame++;
 
         // Render
         setPosRender(-5, -10, 10, 10);
 
-        render(currentImage, currentSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
+        render(displayImage, processingSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 }

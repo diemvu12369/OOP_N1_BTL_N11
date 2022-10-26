@@ -113,7 +113,7 @@ public class Bomber extends MovingObject {
     /**
      * Kiểm tra trên phạm vi đang đứng có item không, nếu có thì thực hiện ăn.
      */
-    public void checkEatItems() {
+    public void checkConsumedItems() {
         int minX = GameVariables.calculateCellIndex(this.getX());
         int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
         int minY = GameVariables.calculateCellIndex(this.getY());
@@ -121,30 +121,30 @@ public class Bomber extends MovingObject {
 
         for (int i = minY; i <= maxY; i++)
             for (int j = minX; j <= maxX; j++) {
-                GameObject currentCell = this.getCorrespondingPlayGround().getCells(i, j);
+                GameObject currentCell = this.getCorrespondingPlayGround().getCell(i, j);
 
                 if (!(currentCell instanceof Item)) {
                     continue;
                 }
 
-                if (!((Item) currentCell).isFinalState() || ((Item) currentCell).getAteStatus()) {
+                if (!((Item) currentCell).isEndingState() || ((Item) currentCell).getConsumed()) {
                     continue;
                 }
 
                 switch (((Item) currentCell).getType()) {
-                    case BOMB_ITEM_:
+                    case ITEM_BOMB_:
                         maxBomb++;
                         break;
-                    case SPEED_ITEM_:
+                    case ITEM_SPEED_:
                         setSpeed(getSpeed() + 1);
                         break;
-                    case FLAME_ITEM_:
+                    case ITEM_FLAME_:
                         flameLength++;
                         break;
                 }
 
                 SoundVariable.playSound(FilesPath.PowerUpAudio);
-                ((Item) currentCell).setAteStatus(true);
+                ((Item) currentCell).setConsumed(true);
             }
     }
 
@@ -153,7 +153,7 @@ public class Bomber extends MovingObject {
      *
      * @return có đứng trên hoặc không
      */
-    public boolean checkOnPortal() {
+    public boolean isOnPortal() {
         int minX = GameVariables.calculateCellIndex(this.getX());
         int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
         int minY = GameVariables.calculateCellIndex(this.getY());
@@ -161,13 +161,13 @@ public class Bomber extends MovingObject {
 
         for (int i = minY; i <= maxY; i++)
             for (int j = minX; j <= maxX; j++) {
-                GameObject currentCell = this.getCorrespondingPlayGround().getCells(i, j);
+                GameObject currentCell = this.getCorrespondingPlayGround().getCell(i, j);
 
                 if (!(currentCell instanceof Portal)) {
                     return false;
                 }
 
-                if (((Portal) currentCell).isFinalState()) return true;
+                if (((Portal) currentCell).isEndingState()) return true;
             }
 
         return false;
@@ -183,14 +183,14 @@ public class Bomber extends MovingObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(4);
+    public void setSettingGraphic() {
+        setFramePerSprite(4);
     }
 
     @Override
-    protected void render(Image currentImage, double renderX, double renderY, double renderWidth, double renderLength) {
+    protected void render(Image displayImage, double renderX, double renderY, double renderWidth, double renderLength) {
         setPosRender(-15, -25, 30, 30);
 
-        super.render(currentImage, renderX, renderY, renderWidth, renderLength);
+        super.render(displayImage, renderX, renderY, renderWidth, renderLength);
     }
 }

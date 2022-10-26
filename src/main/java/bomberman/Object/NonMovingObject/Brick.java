@@ -18,12 +18,12 @@ public class Brick extends Block {
     }
 
     @Override
-    public void setFinalStateImageInfo() {
-        FINAL_STATE_IMAGE = FilesPath.Grass;
+    public void setEndingStateImageInfo() {
+        ENDING_STATE_IMAGE = FilesPath.Grass;
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(10);
+    public void setSettingGraphic() {
+        setFramePerSprite(10);
     }
 }

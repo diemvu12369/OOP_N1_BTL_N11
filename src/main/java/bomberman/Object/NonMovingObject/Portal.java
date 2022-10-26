@@ -18,12 +18,12 @@ public class Portal extends Block {
     }
 
     @Override
-    public void setFinalStateImageInfo() {
-        FINAL_STATE_IMAGE = FilesPath.Portal;
+    public void setEndingStateImageInfo() {
+        ENDING_STATE_IMAGE = FilesPath.Portal;
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(3);
+    public void setSettingGraphic() {
+        setFramePerSprite(3);
     }
 }

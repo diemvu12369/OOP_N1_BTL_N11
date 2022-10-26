@@ -44,8 +44,8 @@ public class Teleport extends Enemy {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(6);
+    public void setSettingGraphic() {
+        setFramePerSprite(6);
     }
 
     public void dead() {
@@ -54,25 +54,25 @@ public class Teleport extends Enemy {
 
     @Override
     public void move() {
-        if (this.checkIntersect(this.getCorrespondingPlayGround().getPlayers().get(0))) {
+        if (this.isIntersect(this.getCorrespondingPlayGround().getPlayerList().get(0))) {
             int cnt = 0;
-            Map<Integer, Pair <Integer, Integer> > map = new HashMap<Integer, Pair <Integer, Integer> >();
-            for (int i = 0; i < PvB_GamePlay.map.getNumberOfRow(); i++) {
-                for (int j = 0; j < PvB_GamePlay.map.getNumberOfColumn(); j++) {
+            Map<Integer, Pair <Integer, Integer> > playground = new HashMap<Integer, Pair <Integer, Integer> >();
+            for (int i = 0; i < PvB_GamePlay.playground.numberOfRow(); i++) {
+                for (int j = 0; j < PvB_GamePlay.playground.numberOfColumn(); j++) {
                     if (!this.getCorrespondingPlayGround().isCellBlocked(i, j) && !this.getCorrespondingPlayGround().getBombState(i, j)) {
                         cnt++;
                         Pair <Integer, Integer> p = new Pair<>(i, j);
-                        map.put(cnt, p);
+                        playground.put(cnt, p);
                     }
                 }
             }
             double randomlyDouble = Math.random();
             randomlyDouble = randomlyDouble * 1000 + 1;
-            int randomInt = (int) randomlyDouble;
-            randomInt = (randomInt % cnt) + 1;
-            Pair <Integer, Integer> p = map.get(randomInt);
-            this.getCorrespondingPlayGround().getPlayers().get(0).setX((double) p.getValue() * GameVariables.unitLength);
-            this.getCorrespondingPlayGround().getPlayers().get(0).setY((double) p.getKey() * GameVariables.unitLength);
+            int randomlyInt = (int) randomlyDouble;
+            randomlyInt = (randomlyInt % cnt) + 1;
+            Pair <Integer, Integer> p = playground.get(randomlyInt);
+            this.getCorrespondingPlayGround().getPlayerList().get(0).setX((double) p.getValue() * GameVariables.unitLength);
+            this.getCorrespondingPlayGround().getPlayerList().get(0).setY((double) p.getKey() * GameVariables.unitLength);
         }
         super.move();
     }

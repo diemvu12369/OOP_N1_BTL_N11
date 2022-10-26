@@ -40,7 +40,7 @@ public class GameVariables {
     public static role playerRole;
 
     public static JSONArray commandList = new JSONArray();
-    public static JSONArray tempCommandList = new JSONArray();
+    public static JSONArray temporaryCommandList = new JSONArray();
 
     public static String commandListString = new String();
 }

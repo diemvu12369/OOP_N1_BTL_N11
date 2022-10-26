@@ -16,7 +16,7 @@ import org.json.JSONObject;
 public abstract class GameObject {
     /**
      * Tham chiếu đến PlayGround mà object này thuộc về trong đó.
-     * (Đặt là correspondingPlayGround để tránh trùng lặp với owner của bomb)
+     * (Đặt là correspondingPlayGround để tránh trùng lặp với bombPlacer của bomb)
      */
     private PlayGround correspondingPlayGround;
 
@@ -39,7 +39,7 @@ public abstract class GameObject {
 
     public void setX(double x) {
         this.x = x;
-        calculateCenterPoint();
+        calculatePointCenter();
     }
 
     /**
@@ -54,7 +54,7 @@ public abstract class GameObject {
     public void setY(double y) {
         this.y = y;
 
-        calculateCenterPoint();
+        calculatePointCenter();
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class GameObject {
     public void setWidth(double width) {
         this.width = width;
 
-        calculateCenterPoint();
+        calculatePointCenter();
     }
 
     /**
@@ -84,25 +84,25 @@ public abstract class GameObject {
     public void setLength(double length) {
         this.length = length;
 
-        calculateCenterPoint();
+        calculatePointCenter();
     }
 
     /**
      * Tọa độ x của tâm object.
      */
-    private double centerX;
+    private double xCenter;
 
-    public double getCenterX() {
-        return centerX;
+    public double getXCenter() {
+        return xCenter;
     }
 
     /**
      * Tọa độ y của tâm object.
      */
-    private double centerY;
+    private double yCenter;
 
-    public double getCenterY() {
-        return centerY;
+    public double getYCenter() {
+        return yCenter;
     }
 
     /**
@@ -123,20 +123,20 @@ public abstract class GameObject {
         this.width = width;
         this.length = length;
 
-        calculateCenterPoint();
+        calculatePointCenter();
 
-        currentSprite = 0;
-        gameFrameCount = 0;
+        processingSprite = 0;
+        countGameFrame = 0;
 
-        setGraphicSetting();
+        setSettingGraphic();
     }
 
     /**
      * Tính tọa độ tâm của object.
      */
-    public void calculateCenterPoint() {
-        centerX = x + width / 2;
-        centerY = y + length / 2;
+    public void calculatePointCenter() {
+        xCenter = x + width / 2;
+        yCenter = y + length / 2;
     }
 
     /**
@@ -156,7 +156,7 @@ public abstract class GameObject {
      * @param other object kia
      * @return có hoặc không
      */
-    public boolean checkIntersect(GameObject other) {
+    public boolean isIntersect(GameObject other) {
         return !(x >= other.getX() + other.getWidth()) &&
                 !(y >= other.getY() + other.getLength()) &&
                 !(x + width <= other.getX()) &&
@@ -172,7 +172,7 @@ public abstract class GameObject {
      * @param current_y_2 max y
      * @return có hoặc không
      */
-    public boolean checkIntersect(double current_x_1, double current_x_2, double current_y_1, double current_y_2) {
+    public boolean isIntersect(double current_x_1, double current_x_2, double current_y_1, double current_y_2) {
         return !(x >= current_x_2) &&
                 !(y >= current_y_2) &&
                 !(x + width <= current_x_1) &&
@@ -184,13 +184,13 @@ public abstract class GameObject {
     /**
      * Số lượng sprite của object này.
      */
-    protected int numberOfSprite;
+    protected int spriteNumber;
 
     /**
      * Chỉ số sprite hiện tại.
-     * (Đánh số từ 0 đến numberOfSprite - 1)
+     * (Đánh số từ 0 đến spriteNumber - 1)
      */
-    protected int currentSprite;
+    protected int processingSprite;
 
     /**
      * Số lượng frame của game chạy để hiển thị 1 sprite của object.
@@ -198,25 +198,25 @@ public abstract class GameObject {
      * để kéo dài thời gian 1 sprite của object hiển thị ra
      * thì cứ mỗi 1 hoặc 1 vài frame của chương trình thì hiển thị
      * 1 sprite của object.
-     * Ví dụ numberOfGameFramePerSprite là 2, thì vòng lặp play() của game
+     * Ví dụ numberOfGameFramePerSprite là 2, thì vòng lặp execute() của game
      * chạy 2 lần thì Object đổi 1 sprite.
      */
-    protected int numberOfFramePerSprite;
+    protected int framePerSprite;
 
-    protected void setNumberOfFramePerSprite(int numberOfFramePerSprite) {
-        this.numberOfFramePerSprite = numberOfFramePerSprite;
+    protected void setFramePerSprite(int framePerSprite) {
+        this.framePerSprite = framePerSprite;
     }
 
     /**
-     * Biến đếm game frame để tính toán currentSprite.
+     * Biến đếm game frame để tính toán processingSprite.
      */
-    protected int gameFrameCount;
+    protected int countGameFrame;
 
     /**
      * Reset lại để sprite sheet chạy từ đầu.
      */
-    protected void resetFrameCount() {
-        gameFrameCount = 0;
+    protected void resetCountFrame() {
+        countGameFrame = 0;
     }
 
     /**
@@ -226,26 +226,26 @@ public abstract class GameObject {
 
     /**
      * Set thông tin về Sprite và hình ảnh(với MovingObject) cho mỗi object riêng biệt.
-     * (Set NumberOfFramePerSprite cho từng object)
+     * (Set FramePerSprite cho từng object)
      */
-    public abstract void setGraphicSetting();
+    public abstract void setSettingGraphic();
 
     // Vị trí để render Object trên màn hình.
     // Bình thường thì nó là kích thước của object.
     // Dùng trong trường hợp muốn hình render ra khác kích thước của object.
-    private double posRenderX;
-    private double posRenderY;
-    private double posRenderWidth;
-    private double posRenderLength;
+    private double posXRendered;
+    private double posYRendered;
+    private double posWidthRendered;
+    private double posLengthRendered;
 
     /**
      * Dùng để thay đổi các posRender dựa trên vị trí thực tế của object.
      */
     public void setPosRender(double deltaX, double deltaY, double deltaWidth, double deltaLength) {
-        posRenderX = x + deltaX;
-        posRenderY = y + deltaY;
-        posRenderWidth = width + deltaWidth;
-        posRenderLength = length + deltaLength;
+        posXRendered = x + deltaX;
+        posYRendered = y + deltaY;
+        posWidthRendered = width + deltaWidth;
+        posLengthRendered = length + deltaLength;
     }
 
     /**
@@ -253,54 +253,54 @@ public abstract class GameObject {
      */
     public void draw() {
         // Image hiện tại
-        Image currentImage = getImage();
+        Image displayImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double widthOfImage = currentImage.getHeight();
-        double lengthOfImage = currentImage.getWidth();
+        double widthOfImage = displayImage.getHeight();
+        double lengthOfImage = displayImage.getWidth();
 
         double sizeOfSprite = widthOfImage;
 
-        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
+        spriteNumber = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
-        if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
-            gameFrameCount = gameFrameCount % (numberOfSprite * numberOfFramePerSprite);
+        if (countGameFrame >= (spriteNumber * framePerSprite)) {
+            countGameFrame = countGameFrame % (spriteNumber * framePerSprite);
         }
 
-        currentSprite = gameFrameCount / numberOfFramePerSprite;
+        processingSprite = countGameFrame / framePerSprite;
 
-        gameFrameCount++;
+        countGameFrame++;
 
         // Render
         setPosRender(0, 0, 0, 0);
 
-        render(currentImage, currentSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
+        render(displayImage, processingSprite * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 
     /**
      * Gửi thông tin đến server hoặc render ở client
      */
-    protected void render(Image currentImage, double renderX, double renderY, double renderWidth, double renderLength) {
+    protected void render(Image displayImage, double renderX, double renderY, double renderWidth, double renderLength) {
         if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-            JSONObject jsonObject = new JSONObject();
+            JSONObject json = new JSONObject();
             try {
-                jsonObject.put("Image", FilesPath.getImageName(currentImage));
-                jsonObject.put("imageX", "" + renderX);
-                jsonObject.put("imageY", "" + renderY);
-                jsonObject.put("widthOfImage", "" + renderWidth);
-                jsonObject.put("lengthOfImage", "" + renderLength);
-                jsonObject.put("x", "" + posRenderX);
-                jsonObject.put("y", "" + posRenderY);
-                jsonObject.put("width", "" + posRenderWidth);
-                jsonObject.put("length", "" + posRenderLength);
-                GameVariables.tempCommandList.put(jsonObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                json.put("Image", FilesPath.getImageName(displayImage));
+                json.put("imageX", "" + renderX);
+                json.put("imageY", "" + renderY);
+                json.put("widthOfImage", "" + renderWidth);
+                json.put("lengthOfImage", "" + renderLength);
+                json.put("x", "" + posXRendered);
+                json.put("y", "" + posYRendered);
+                json.put("width", "" + posWidthRendered);
+                json.put("length", "" + posLengthRendered);
+                GameVariables.temporaryCommandList.put(json);
+            } catch (JSONException event) {
+                event.printStackTrace();
             }
         } else {
-            RenderVariable.gc.drawImage(currentImage, renderX, renderY, renderWidth, renderLength,
-                    posRenderX, posRenderY, posRenderWidth, posRenderLength);
+            RenderVariable.gc.drawImage(displayImage, renderX, renderY, renderWidth, renderLength,
+                    posXRendered, posYRendered, posWidthRendered, posLengthRendered);
         }
     }
 }

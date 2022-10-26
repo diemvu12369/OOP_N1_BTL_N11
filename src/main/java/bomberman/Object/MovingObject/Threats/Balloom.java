@@ -37,8 +37,8 @@ public class Balloom extends Enemy {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(6);
+    public void setSettingGraphic() {
+        setFramePerSprite(6);
     }
 
     public void dead() {

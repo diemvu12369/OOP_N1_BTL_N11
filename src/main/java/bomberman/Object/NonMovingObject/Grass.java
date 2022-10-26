@@ -27,7 +27,7 @@ public class Grass extends GameObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(3);
+    public void setSettingGraphic() {
+        setFramePerSprite(3);
     }
 }

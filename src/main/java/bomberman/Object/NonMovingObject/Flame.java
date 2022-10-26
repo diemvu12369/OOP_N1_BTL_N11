@@ -14,13 +14,13 @@ public class Flame extends GameObject {
      * List of flame type.
      */
     public enum FlameType {
-        LEFT_,
-        RIGHT_,
-        UP_,
-        DOWN_,
-        CENTER_,
-        HORIZONTAL_,
-        VERTICAL_
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
+        CENTER,
+        HORIZONTAL,
+        VERTICAL
     }
 
     /**
@@ -31,7 +31,7 @@ public class Flame extends GameObject {
     /**
      * Flame start time.
      */
-    private long startTime;
+    private long plantTime;
 
     /**
      * Flame duration.
@@ -66,7 +66,7 @@ public class Flame extends GameObject {
 
         this.type = type;
 
-        startTime = System.nanoTime();
+        plantTime = System.nanoTime();
     }
 
     /**
@@ -74,23 +74,23 @@ public class Flame extends GameObject {
      */
     public static void handleIntersectCell(GameObject cell) {
         if (cell instanceof Item) {
-            if (((Item) cell).isInitialState()) {
-                ((Item) cell).setBlockState(Block.BlockState.EXPLODING_STATE_);
-                ((Item) cell).setStartExplodingTime(System.nanoTime());
+            if (((Item) cell).isStartingState()) {
+                ((Item) cell).setStateOfBlock(Block.StateOfBlock.EXPLODED_STATE_);
+                ((Item) cell).setExplodeTime(System.nanoTime());
             }
         }
 
         if (cell instanceof Brick) {
-            if (((Brick) cell).isInitialState()) {
-                ((Brick) cell).setBlockState(Block.BlockState.EXPLODING_STATE_);
-                ((Brick) cell).setStartExplodingTime(System.nanoTime());
+            if (((Brick) cell).isStartingState()) {
+                ((Brick) cell).setStateOfBlock(Block.StateOfBlock.EXPLODED_STATE_);
+                ((Brick) cell).setExplodeTime(System.nanoTime());
             }
         }
 
         if (cell instanceof Portal) {
-            if (((Portal) cell).isInitialState()) {
-                ((Portal) cell).setBlockState(Block.BlockState.EXPLODING_STATE_);
-                ((Portal) cell).setStartExplodingTime(System.nanoTime());
+            if (((Portal) cell).isStartingState()) {
+                ((Portal) cell).setStateOfBlock(Block.StateOfBlock.EXPLODED_STATE_);
+                ((Portal) cell).setExplodeTime(System.nanoTime());
             }
         }
     }
@@ -98,7 +98,7 @@ public class Flame extends GameObject {
     /**
      * Check xem ô nào bị nổ.
      */
-    public void checkIntersectCells() {
+    public void isIntersectCell() {
         int minX = GameVariables.calculateCellIndex(this.getX());
         int maxX = GameVariables.calculateCellIndex(this.getX() + this.getWidth() - 1);
         int minY = GameVariables.calculateCellIndex(this.getY());
@@ -106,7 +106,7 @@ public class Flame extends GameObject {
 
         for (int i = minY; i <= maxY; i++)
             for (int j = minX; j <= maxX; j++) {
-                handleIntersectCell(this.getCorrespondingPlayGround().getCells(i, j));
+                handleIntersectCell(this.getCorrespondingPlayGround().getCell(i, j));
             }
     }
 
@@ -115,8 +115,8 @@ public class Flame extends GameObject {
      *
      * @return chưa hoặc rồi
      */
-    public boolean checkExpired() {
-        return (System.nanoTime() - startTime >= duration);
+    public boolean hasEnded() {
+        return (System.nanoTime() - plantTime >= duration);
     }
 
     @Override
@@ -125,48 +125,48 @@ public class Flame extends GameObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(4);
+    public void setSettingGraphic() {
+        setFramePerSprite(4);
     }
 
     public void draw() {
         // Image hiện tại
-        Image currentImage = getImage();
+        Image displayImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double widthOfImage = currentImage.getHeight();
-        double lengthOfImage = currentImage.getWidth();
+        double widthOfImage = displayImage.getHeight();
+        double lengthOfImage = displayImage.getWidth();
 
         double sizeOfSprite = widthOfImage / 5;
 
-        numberOfSprite = (int) (lengthOfImage / sizeOfSprite);
+        spriteNumber = (int) (lengthOfImage / sizeOfSprite);
 
         // Tính toán currentFrame
-        if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
-            gameFrameCount = gameFrameCount % (numberOfSprite * numberOfFramePerSprite);
+        if (countGameFrame >= (spriteNumber * framePerSprite)) {
+            countGameFrame = countGameFrame % (spriteNumber * framePerSprite);
         }
 
-        currentSprite = gameFrameCount / numberOfFramePerSprite;
+        processingSprite = countGameFrame / framePerSprite;
 
-        gameFrameCount++;
+        countGameFrame++;
 
         // Render
         setPosRender(0, 0, 0, 0);
 
-        double renderX = currentSprite * sizeOfSprite;
+        double renderX = processingSprite * sizeOfSprite;
         double renderY;
 
         switch (type) {
-            case UP_:
+            case UP:
                 renderY = 1;
                 break;
-            case DOWN_:
+            case DOWN:
                 renderY = 2;
                 break;
-            case LEFT_:
+            case LEFT:
                 renderY = 3;
                 break;
-            case RIGHT_:
+            case RIGHT:
                 renderY = 4;
                 break;
             default:
@@ -176,6 +176,6 @@ public class Flame extends GameObject {
 
         renderY *= sizeOfSprite;
 
-        render(currentImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
+        render(displayImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
     }
 }

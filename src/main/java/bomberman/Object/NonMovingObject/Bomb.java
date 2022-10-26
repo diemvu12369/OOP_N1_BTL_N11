@@ -20,24 +20,24 @@ import javax.sound.sampled.FloatControl;
 
 public class Bomb extends GameObject {
     /**
-     * Owner of the bomb.
+     * BombPlacer of the bomb.
      */
-    private Bomber owner;
+    private Bomber bombPlacer;
 
     /**
      * Explosion start time.
      */
-    private long startTime;
+    private long plantTime;
 
-    private ArrayList<MovingObject> unblockObject = new ArrayList<>();
+    private ArrayList<MovingObject> explodedObject = new ArrayList<>();
 
     /**
      * Explosion duration.
      */
-    private final long EXISTENCE_DURATION = 2000000000; // 2 giây
+    private final long EXIST_DURATION = 2000000000; // 2 giây
 
-    public Bomber getOwner() {
-        return owner;
+    public Bomber getBombPlacer() {
+        return bombPlacer;
     }
 
     /**
@@ -52,17 +52,17 @@ public class Bomb extends GameObject {
     public Bomb(PlayGround correspondingPlayGround, double x, double y, double width, double length) {
         super(correspondingPlayGround, x, y, width, length);
 
-        this.startTime = System.nanoTime();
+        this.plantTime = System.nanoTime();
 
-        for (Bomber X : this.getCorrespondingPlayGround().getPlayers()) {
-            if (X.checkIntersect(this)) {
-                unblockObject.add(X);
+        for (Bomber X : this.getCorrespondingPlayGround().getPlayerList()) {
+            if (X.isIntersect(this)) {
+                explodedObject.add(X);
             }
         }
 
-        for (Enemy X : this.getCorrespondingPlayGround().getEnemies()) {
-            if (X.checkIntersect(this)) {
-                unblockObject.add(X);
+        for (Enemy X : this.getCorrespondingPlayGround().getEnemyList()) {
+            if (X.isIntersect(this)) {
+                explodedObject.add(X);
             }
         }
 
@@ -80,23 +80,23 @@ public class Bomb extends GameObject {
      * @param y        tọa độ y
      * @param width    chiều rộng
      * @param length   chiều dài
-     * @param owner    chủ thể của quả bom
+     * @param bombPlacer    chủ thể của quả bom
      */
-    public Bomb(PlayGround correspondingPlayGround, double x, double y, double width, double length, Bomber owner) {
+    public Bomb(PlayGround correspondingPlayGround, double x, double y, double width, double length, Bomber bombPlacer) {
         super(correspondingPlayGround, x, y, width, length);
 
-        this.owner = owner;
-        this.startTime = System.nanoTime();
+        this.bombPlacer = bombPlacer;
+        this.plantTime = System.nanoTime();
 
-        for (Bomber X : this.getCorrespondingPlayGround().getPlayers()) {
-            if (X.checkIntersect(this)) {
-                unblockObject.add(X);
+        for (Bomber X : this.getCorrespondingPlayGround().getPlayerList()) {
+            if (X.isIntersect(this)) {
+                explodedObject.add(X);
             }
         }
 
-        for (Enemy X : this.getCorrespondingPlayGround().getEnemies()) {
-            if (X.checkIntersect(this)) {
-                unblockObject.add(X);
+        for (Enemy X : this.getCorrespondingPlayGround().getEnemyList()) {
+            if (X.isIntersect(this)) {
+                explodedObject.add(X);
             }
         }
 
@@ -107,22 +107,22 @@ public class Bomb extends GameObject {
     }
 
     /**
-     * Update lại unblock list.
+     * Update lại exploded list.
      */
-    public void updateUnblockList() {
-        for (int i = 0; i < this.getCorrespondingPlayGround().getPlayers().size(); i++) {
-            MovingObject X = this.getCorrespondingPlayGround().getPlayers().get(i);
-            if (unblockObject.contains(X) && !X.checkIntersect(this)) {
-                unblockObject.remove(X);
+    public void updateExplodedList() {
+        for (int i = 0; i < this.getCorrespondingPlayGround().getPlayerList().size(); i++) {
+            MovingObject X = this.getCorrespondingPlayGround().getPlayerList().get(i);
+            if (explodedObject.contains(X) && !X.isIntersect(this)) {
+                explodedObject.remove(X);
 
                 i--;
             }
         }
 
-        for (int i = 0; i < this.getCorrespondingPlayGround().getEnemies().size(); i++) {
-            MovingObject X = this.getCorrespondingPlayGround().getEnemies().get(i);
-            if (unblockObject.contains(X) && !X.checkIntersect(this)) {
-                unblockObject.remove(X);
+        for (int i = 0; i < this.getCorrespondingPlayGround().getEnemyList().size(); i++) {
+            MovingObject X = this.getCorrespondingPlayGround().getEnemyList().get(i);
+            if (explodedObject.contains(X) && !X.isIntersect(this)) {
+                explodedObject.remove(X);
 
                 i--;
             }
@@ -132,140 +132,140 @@ public class Bomb extends GameObject {
     /**
      * Kiểm tra đã đến thời gian nổ chưa.
      */
-    public boolean checkExplode() {
-        return (System.nanoTime() - startTime >= EXISTENCE_DURATION);
+    public boolean checkExplosion() {
+        return (System.nanoTime() - plantTime >= EXIST_DURATION);
     }
 
     /**
      * Check xem bomb có block object này không.
-     * (chỉ không block khi owner mới đặt bomb, khi owner đi ra khỏi bomb sẽ bị block)
+     * (chỉ không block khi bombPlacer mới đặt bomb, khi bombPlacer đi ra khỏi bomb sẽ bị block)
      *
      * @param tempObject object cần check
      * @return có block hoặc không
      */
     public boolean checkBlockStatusWithObject(MovingObject tempObject) {
-        return !unblockObject.contains(tempObject);
+        return !explodedObject.contains(tempObject);
     }
 
     /**
      * Kích nổ quả bom.
      */
-    public void detonateBomb() {
+    public void explodeBomb() {
         int tempX = GameVariables.calculateCellIndex(this.getX());
         int tempY = GameVariables.calculateCellIndex(this.getY());
 
         // Xóa bomb state
         this.getCorrespondingPlayGround().setBombState(tempY, tempX, false);
 
-        int len = owner.getFlameLength();
+        int length = bombPlacer.getFlameLength();
         int side = (int) GameVariables.unitLength;
 
         // sinh flame ra bên trái bom
-        for (int i = tempX - 1; i >= 0 && i >= tempX - len; i--) {
-            boolean breakFlame = false;
+        for (int i = tempX - 1; i >= 0 && i >= tempX - length; i--) {
+            boolean stopFlame = false;
 
             // gặp cô cản, ngừng sinh flame
             if (this.getCorrespondingPlayGround().isCellBlocked(tempY, i)) {
-                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCells(tempY, i));
+                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCell(tempY, i));
 
-                breakFlame = true;
+                stopFlame = true;
 
-                if (!(this.getCorrespondingPlayGround().getCells(tempY, i) instanceof Block))  {
+                if (!(this.getCorrespondingPlayGround().getCell(tempY, i) instanceof Block))  {
                     break;
                 }
             }
 
-            if (i == tempX - len) {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.LEFT_));
+            if (i == tempX - length) {
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.LEFT));
             } else {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.HORIZONTAL_));
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.HORIZONTAL));
             }
 
-            if (breakFlame) {
+            if (stopFlame) {
                 break;
             }
         }
 
         // sinh flame ra bên phải bom
-        for (int i = tempX + 1; i <= this.getCorrespondingPlayGround().getNumberOfColumn() && i <= tempX + len; i++) {
-            boolean breakFlame = false;
+        for (int i = tempX + 1; i <= this.getCorrespondingPlayGround().numberOfColumn() && i <= tempX + length; i++) {
+            boolean stopFlame = false;
 
             // gặp cô cản, ngừng sinh flame
             if (this.getCorrespondingPlayGround().isCellBlocked(tempY, i)) {
-                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCells(tempY, i));
+                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCell(tempY, i));
 
-                breakFlame = true;
+                stopFlame = true;
 
-                if (!(this.getCorrespondingPlayGround().getCells(tempY, i) instanceof Block))  {
+                if (!(this.getCorrespondingPlayGround().getCell(tempY, i) instanceof Block))  {
                     break;
                 }
             }
 
-            if (i == tempX + len) {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.RIGHT_));
+            if (i == tempX + length) {
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.RIGHT));
             } else {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.HORIZONTAL_));
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), i * side, tempY * side, side, side, Flame.FlameType.HORIZONTAL));
             }
 
-            if (breakFlame) {
+            if (stopFlame) {
                 break;
             }
         }
 
         // sinh flame ra bên trên bom
-        for (int i = tempY - 1; i >= 0 && i >= tempY - len; i--) {
-            boolean breakFlame = false;
+        for (int i = tempY - 1; i >= 0 && i >= tempY - length; i--) {
+            boolean stopFlame = false;
 
             // gặp cô cản, ngừng sinh flame
             if (this.getCorrespondingPlayGround().isCellBlocked(i, tempX)) {
-                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCells(i, tempX));
+                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCell(i, tempX));
 
-                breakFlame = true;
+                stopFlame = true;
 
-                if (!(this.getCorrespondingPlayGround().getCells(i, tempX) instanceof Block))  {
+                if (!(this.getCorrespondingPlayGround().getCell(i, tempX) instanceof Block))  {
                     break;
                 }
             }
 
-            if (i == tempY - len) {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.UP_));
+            if (i == tempY - length) {
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.UP));
             } else {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.VERTICAL_));
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.VERTICAL));
             }
 
-            if (breakFlame) {
+            if (stopFlame) {
                 break;
             }
         }
 
         // sinh flame ra bên dưới bom
-        for (int i = tempY + 1; i <= this.getCorrespondingPlayGround().getNumberOfRow() && i <= tempY + len; i++) {
-            boolean breakFlame = false;
+        for (int i = tempY + 1; i <= this.getCorrespondingPlayGround().numberOfRow() && i <= tempY + length; i++) {
+            boolean stopFlame = false;
 
             // gặp cô cản, ngừng sinh flame
             if (this.getCorrespondingPlayGround().isCellBlocked(i, tempX)) {
-                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCells(i, tempX));
+                Flame.handleIntersectCell(this.getCorrespondingPlayGround().getCell(i, tempX));
 
-                breakFlame = true;
+                stopFlame = true;
 
-                if (!(this.getCorrespondingPlayGround().getCells(i, tempX) instanceof Block))  {
+                if (!(this.getCorrespondingPlayGround().getCell(i, tempX) instanceof Block))  {
                     break;
                 }
             }
 
-            if (i == tempY + len) {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.DOWN_));
+            if (i == tempY + length) {
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.DOWN));
             } else {
-                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.VERTICAL_));
+                this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, i * side, side, side, Flame.FlameType.VERTICAL));
             }
 
-            if (breakFlame) {
+            if (stopFlame) {
                 break;
             }
         }
 
         //sinh flame ở chính giữa
-        this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, tempY * side, side, side, Flame.FlameType.CENTER_));
+        this.getCorrespondingPlayGround().addFlame(new Flame(this.getCorrespondingPlayGround(), tempX * side, tempY * side, side, side, Flame.FlameType.CENTER));
 
         SoundVariable.playSound(FilesPath.ExplosionAudio);
         //FilesPath.ExplosionAudio.setMicrosecondPosition(0);
@@ -277,14 +277,14 @@ public class Bomb extends GameObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(5);
+    public void setSettingGraphic() {
+        setFramePerSprite(5);
     }
 
     @Override
-    protected void render(Image currentImage, double renderX, double renderY, double renderWidth, double renderLength) {
+    protected void render(Image displayImage, double renderX, double renderY, double renderWidth, double renderLength) {
         setPosRender(5, 5, -10, -10);
 
-        super.render(currentImage, renderX, renderY, renderWidth, renderLength);
+        super.render(displayImage, renderX, renderY, renderWidth, renderLength);
     }
 }

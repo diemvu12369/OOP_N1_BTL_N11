@@ -20,21 +20,21 @@ public class Client {
     // socket
     public Socket socket = null;
     // luồng đẩy dữ liệu đến server
-    public BufferedWriter os = null;
+    public BufferedWriter outputStream = null;
     // luồng nhận dữ liệu từ server
-    public BufferedReader is = null;
+    public BufferedReader inputStream = null;
 
     // khởi tạo đối tượng client mới
     public Client() {
         try {
             host = InetAddress.getLocalHost();
             socket = new Socket(host.getHostName(), LANVariables.PORT);
-            is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            os = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            outputStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             socket.setTcpNoDelay(true);
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException event) {
             socket = null;
-        } catch (IOException e) {
+        } catch (IOException event) {
             socket = null;
         }
     }
@@ -43,17 +43,17 @@ public class Client {
         try {
             host = InetAddress.getByName(IP);
             socket = new Socket(host.getHostName(), LANVariables.PORT);
-            is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            os = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            outputStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             socket.setTcpNoDelay(true);
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException event) {
             socket = null;
-        } catch (IOException e) {
+        } catch (IOException event) {
             socket = null;
         }
     }
 
-    public static boolean createClientWithIP(String IP) {
+    public static boolean createClientGivenIP(String IP) {
         LANVariables.client = new Client(IP);
         if (LANVariables.client == null || LANVariables.client.socket == null) return false;
         GameVariables.playerRole = GameVariables.role.PLAYER_2;
@@ -61,38 +61,38 @@ public class Client {
     }
 
     // gửi dữ liệu tới server
-    public void sendDataToServer(JSONObject jsonObject) {
+    public void uploadDataToServer(JSONObject json) {
         try {
-            os.write(jsonObject.toString() + "\n");
-            os.flush();
-        } catch (UnknownHostException e) {
-            System.err.println("Trying to connect to unknown host: " + e);
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+            outputStream.write(json.toString() + "\n");
+            outputStream.flush();
+        } catch (UnknownHostException event) {
+            System.err.println("Trying to connect to unknown host: " + event);
+        } catch (IOException event) {
+            System.err.println("IOException:  " + event);
         }
     }
 
-    public void sendDataToServer(String s) {
+    public void uploadDataToServer(String s) {
         try {
-            os.write(s + "\n");
-            os.flush();
-        } catch (UnknownHostException e) {
-            System.err.println("Trying to connect to unknown host: " + e);
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+            outputStream.write(s + "\n");
+            outputStream.flush();
+        } catch (UnknownHostException event) {
+            System.err.println("Trying to connect to unknown host: " + event);
+        } catch (IOException event) {
+            System.err.println("IOException:  " + event);
         }
     }
 
     // nhận data từ server
-    public String readDataFromServer() {
+    public String downloadDataFromServer() {
         try {
-            String command = is.readLine();
+            String command = inputStream.readLine();
             if ((command == null) || (command.length() == 0) || (command.charAt(0) != '[')) {
                 return "NOT COMMAND";
             } else {
                 return command;
             }
-        } catch (IOException e) {
+        } catch (IOException event) {
             System.out.println("Can not read data from server");
             return "NOT COMMAND";
         }
@@ -103,113 +103,113 @@ public class Client {
      * Tránh bị lặp tiếng.
      * True là đã đặt, false là chưa.
      */
-    public static boolean alreadyCreateBombThisTurn = false;
+    public static boolean createdBombThisTurn = false;
 
-    public static int countCreateBomb = 0;
+    public static int countCreatedBomb = 0;
 
     /**
      * Xử lí thao tác ấn phím. Biến nó thành lệnh gửi đến server
      *
-     * @param e Key Event
+     * @param event Key Event
      */
-    public static void inputKeyPress(KeyEvent e) {
-        JSONObject jsonObject = new JSONObject();
-        if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
+    public static void inputPressedKey(KeyEvent event) {
+        JSONObject json = new JSONObject();
+        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.RIGHT_);
-                jsonObject.put("status", true);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.RIGHT);
+                json.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
+        } else if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.A) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.LEFT_);
-                jsonObject.put("status", true);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.LEFT);
+                json.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
+        } else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.W) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.UP_);
-                jsonObject.put("status", true);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.UP);
+                json.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
+        } else if (event.getCode() == KeyCode.DOWN || event.getCode() == KeyCode.S) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.DOWN_);
-                jsonObject.put("status", true);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.DOWN);
+                json.put("status", true);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.SPACE) {
-            if (!alreadyCreateBombThisTurn) {
+        } else if (event.getCode() == KeyCode.SPACE) {
+            if (!createdBombThisTurn) {
                 try {
-                    jsonObject.put("player", GameVariables.playerRole);
-                    jsonObject.put("direction", "placeBomb");
+                    json.put("player", GameVariables.playerRole);
+                    json.put("direction", "placeBomb");
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
                 }
 
-                alreadyCreateBombThisTurn = true;
+                createdBombThisTurn = true;
             }
         } else return;
 
         // Gửi lệnh đến server
-        LANVariables.client.sendDataToServer(jsonObject);
+        LANVariables.client.uploadDataToServer(json);
     }
 
     /**
      * Xử lí thao tác nhả phím. Biến nó thành lệnh gửi tới server
      *
-     * @param e Key Event
+     * @param event Key Event
      */
-    public static void inputKeyRelease(KeyEvent e) {
-        JSONObject jsonObject = new JSONObject();
-        if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.D) {
+    public static void inputReleasedKey(KeyEvent event) {
+        JSONObject json = new JSONObject();
+        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.RIGHT_);
-                jsonObject.put("status", false);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.RIGHT);
+                json.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A) {
+        } else if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.A) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.LEFT_);
-                jsonObject.put("status", false);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.LEFT);
+                json.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.W) {
+        } else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.W) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.UP_);
-                jsonObject.put("status", false);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.UP);
+                json.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
-        } else if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.S) {
+        } else if (event.getCode() == KeyCode.DOWN || event.getCode() == KeyCode.S) {
             try {
-                jsonObject.put("player", GameVariables.playerRole);
-                jsonObject.put("direction", MovingObject.DirectionOfObject.DOWN_);
-                jsonObject.put("status", false);
+                json.put("player", GameVariables.playerRole);
+                json.put("direction", MovingObject.DirectionOfObject.DOWN);
+                json.put("status", false);
             } catch (JSONException jsonException) {
                 jsonException.printStackTrace();
             }
         } else return;
 
         // gửi lệnh đến server
-        LANVariables.client.sendDataToServer(jsonObject);
+        LANVariables.client.uploadDataToServer(json);
     }
 
     // giải mã các lệnh in từ server
-    public static boolean decodeRenderCommand(String command) {
+    public static boolean executeRenderCommand(String command) {
         if (command.equals("NOT COMMAND")) {
             return false;
         }
@@ -298,7 +298,7 @@ public class Client {
             }
 
             return false;
-        } catch (JSONException e) {
+        } catch (JSONException event) {
             return false;
         }
     }

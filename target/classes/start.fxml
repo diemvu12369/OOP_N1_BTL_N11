@@ -62,7 +62,7 @@
                </ImageView>
            </children>
         </Group>
-        <Group fx:id="createSv" layoutX="0" layoutY="0">
+        <Group fx:id="createServer" layoutX="0" layoutY="0">
            <children>
                <TextArea fx:id="textIP" layoutX="152.0" layoutY="325.0" opacity="0.72" prefHeight="51.0" prefWidth="494.0" promptText="IP address">
                    <font>
@@ -79,7 +79,7 @@
                </Text>
            </children>
         </Group>
-        <Group fx:id="joinSv" layoutX="0" layoutY="0">
+        <Group fx:id="joinServer" layoutX="0" layoutY="0">
            <children>
                <TextArea fx:id="byIP" editable="true" layoutX="152.0" layoutY="325.0" opacity="0.72" prefHeight="51.0" prefWidth="494.0" promptText="IP address">
                    <font>

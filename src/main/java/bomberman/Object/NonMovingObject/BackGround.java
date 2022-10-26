@@ -22,8 +22,8 @@ public class BackGround extends GameObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(1);
+    public void setSettingGraphic() {
+        setFramePerSprite(1);
     }
 
     @Override

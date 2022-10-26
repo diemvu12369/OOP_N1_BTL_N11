@@ -15,258 +15,258 @@ public class PvP_GamePlay {
     /**
      * Trạng thái game (đang chơi, thắng, thua).
      */
-    public enum typeOfGameStatus {
-        PLAYING_,
-        NOTPLAYING_,
+    public enum typeOfStatus {
+        ONGOING,
+        HAVE_NOT_STARTED,
     }
 
     /**
      * Trạng thái game hiện tại.
      */
-    private typeOfGameStatus gameStatus;
+    private typeOfStatus status;
 
-    public void setGameStatus(typeOfGameStatus inputGameStatus) {
-        gameStatus = inputGameStatus;
+    public void setStatus(typeOfStatus inputStatus) {
+        status = inputStatus;
     }
 
-    public typeOfGameStatus getGameStatus() {
-        return gameStatus;
+    public typeOfStatus getStatus() {
+        return status;
     }
 
     /**
      * Map.
      */
-    public PlayGround map;
+    public PlayGround playground;
 
     /**
      * Player thứ nhất, đồng thời là server.
      */
-    public Bomber player1;
+    public Bomber hostPlayer;
 
     /**
      * Player thứ hai
      */
-    public Bomber player2;
+    public Bomber guestPlayer;
 
 
     /**
      * Biến để kiểm soát game chạy hay dừng.
      */
-    public boolean needToWait;
+    public boolean isWaiting;
 
     /**
      * Khởi tạo màn chơi PvP.
      * (Khởi tạo các biến phục vụ cho màn chơi)
      */
     public PvP_GamePlay() {
-        map = new PlayGround(FilesPath.PVP_MAP_PATH);
+        playground = new PlayGround(FilesPath.PVP_MAP_PATH);
 
-        player1 = map.getPlayers().get(0);
-        player2 = map.getPlayers().get(1);
+        hostPlayer = playground.getPlayerList().get(0);
+        guestPlayer = playground.getPlayerList().get(1);
 
-        needToWait = false;
+        isWaiting = false;
     }
 
     /**
      * Render screen.
      */
-    public void createCommand() {
-        map.render();
-        GameVariables.commandList = GameVariables.tempCommandList;
-        GameVariables.tempCommandList = new JSONArray();
+    public void sendRenderCommand() {
+        playground.render();
+        GameVariables.commandList = GameVariables.temporaryCommandList;
+        GameVariables.temporaryCommandList = new JSONArray();
     }
 
-    public void playPlayGroundAudio() {
+    public void playBackgroundAudio() {
         SoundVariable.loopSound(FilesPath.PlayGroundAudio, 1000);
     }
 
     /**
      * Xử lý game player 1 thắng.
      */
-    public void gamePlayer1Won() {
+    public void gameHostPlayerWon() {
         try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouWon");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_1");
-            GameVariables.tempCommandList.put(jsonObject);
+            JSONObject json = new JSONObject();
+            json.put("Image", "YouWon");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_1");
+            GameVariables.temporaryCommandList.put(json);
 
-            jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouLose");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_2");
-            GameVariables.tempCommandList.put(jsonObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            json = new JSONObject();
+            json.put("Image", "YouLose");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_2");
+            GameVariables.temporaryCommandList.put(json);
+        } catch (JSONException event) {
+            event.printStackTrace();
         }
 
         SoundVariable.endAllSounds();
 
-        GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = typeOfGameStatus.NOTPLAYING_;
+        GameVariables.commandList = GameVariables.temporaryCommandList;
+        status = typeOfStatus.HAVE_NOT_STARTED;
     }
 
     /**
      * Xử lý game player 2 thắng.
      */
-    public void gamePlayer2Won() {
+    public void gameGuestPlayerWon() {
         try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouWon");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_2");
-            GameVariables.tempCommandList.put(jsonObject);
+            JSONObject json = new JSONObject();
+            json.put("Image", "YouWon");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_2");
+            GameVariables.temporaryCommandList.put(json);
 
-            jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouLose");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_1");
-            GameVariables.tempCommandList.put(jsonObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            json = new JSONObject();
+            json.put("Image", "YouLose");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_1");
+            GameVariables.temporaryCommandList.put(json);
+        } catch (JSONException event) {
+            event.printStackTrace();
         }
 
         SoundVariable.endAllSounds();
 
-        GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = typeOfGameStatus.NOTPLAYING_;
+        GameVariables.commandList = GameVariables.temporaryCommandList;
+        status = typeOfStatus.HAVE_NOT_STARTED;
     }
 
     /**
      * Xử lý game hòa.
      */
-    public void gameDraw() {
+    public void draw() {
         try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouDraw");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_1");
-            GameVariables.tempCommandList.put(jsonObject);
+            JSONObject json = new JSONObject();
+            json.put("Image", "YouDraw");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_1");
+            GameVariables.temporaryCommandList.put(json);
 
-            jsonObject = new JSONObject();
-            jsonObject.put("Image", "YouDraw");
-            jsonObject.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
-            jsonObject.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
-            jsonObject.put("width", "" + 400);
-            jsonObject.put("length", "" + 400);
-            jsonObject.put("player", "PLAYER_2");
-            GameVariables.tempCommandList.put(jsonObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            json = new JSONObject();
+            json.put("Image", "YouDraw");
+            json.put("x", "" + (RenderVariable.SCREEN_LENGTH / 2 - 200));
+            json.put("y", "" + (RenderVariable.SCREEN_WIDTH / 2 - 200));
+            json.put("width", "" + 400);
+            json.put("length", "" + 400);
+            json.put("player", "PLAYER_2");
+            GameVariables.temporaryCommandList.put(json);
+        } catch (JSONException event) {
+            event.printStackTrace();
         }
 
         SoundVariable.endAllSounds();
 
-        GameVariables.commandList = GameVariables.tempCommandList;
-        gameStatus = typeOfGameStatus.NOTPLAYING_;
+        GameVariables.commandList = GameVariables.temporaryCommandList;
+        status = typeOfStatus.HAVE_NOT_STARTED;
     }
 
     /**
      * Chạy game.
      */
-    public void play() {
-        if (needToWait) {
+    public void execute() {
+        if (isWaiting) {
             SoundVariable.endAllSounds();
 
-            playPlayGroundAudio();
+            playBackgroundAudio();
 
-            needToWait = false;
+            isWaiting = false;
         }
 
-        boolean player1_die = false;
-        boolean player2_die = false;
+        boolean hostPlayer_die = false;
+        boolean guestPlayer_die = false;
 
-        for (Flame flame : map.getFlames()) {
+        for (Flame flame : playground.getFlameList()) {
 
             // nếu flame chạm nhân vật 1
-            if (flame.checkIntersect(player1)) {
-                player1_die = true;
+            if (flame.isIntersect(hostPlayer)) {
+                hostPlayer_die = true;
             }
 
             //nếu flame chạm nhân vật 2
-            if (flame.checkIntersect(player2)) {
-                player2_die = true;
+            if (flame.isIntersect(guestPlayer)) {
+                guestPlayer_die = true;
             }
         }
 
-        if (player1_die && player2_die) {
-            gameDraw();
+        if (hostPlayer_die && guestPlayer_die) {
+            draw();
             return;
-        } else if (player1_die) {
-            gamePlayer2Won();
+        } else if (hostPlayer_die) {
+            gameGuestPlayerWon();
             return;
-        } else if (player2_die) {
-            gamePlayer1Won();
+        } else if (guestPlayer_die) {
+            gameHostPlayerWon();
             return;
         }
 
         //cập nhật trạng thái của bản đồ
-        for (int i = 0; i < map.getNumberOfRow(); i++) {
-            for (int j = 0; j < map.getNumberOfColumn(); j++) {
-                GameObject currentCell = map.getCells(i, j);
+        for (int i = 0; i < playground.numberOfRow(); i++) {
+            for (int j = 0; j < playground.numberOfColumn(); j++) {
+                GameObject currentCell = playground.getCell(i, j);
 
                 //hủy những ô brick đã hết thời gian nổ
                 if (currentCell instanceof Brick) {
-                    if (((Brick) currentCell).checkExplodingExpired()) {
-                        ((Brick) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
+                    if (((Brick) currentCell).isExplodingExpired()) {
+                        ((Brick) currentCell).setStateOfBlock(Block.StateOfBlock.ENDING_STATE_);
                     }
                 }
 
                 //hủy những ô item đã hết thời gian nổ
                 if (currentCell instanceof Item) {
-                    if (((Item) currentCell).checkExplodingExpired()) {
+                    if (((Item) currentCell).isExplodingExpired()) {
                         SoundVariable.playSound(FilesPath.ItemAppearsAudio);
-                        ((Item) currentCell).setBlockState(Block.BlockState.FINAL_STATE_);
+                        ((Item) currentCell).setStateOfBlock(Block.StateOfBlock.ENDING_STATE_);
                     }
                 }
             }
         }
 
         //kiểm tra xem bom đã đến lúc nổ chưa, nếu đến thì cho nổ, tạo flame và xóa bom
-        for (int i = 0; i < map.getBombs().size(); i++) {
-            if (map.getBombs().get(i).checkExplode()) {
-                map.getBombs().get(i).detonateBomb();
+        for (int i = 0; i < playground.getBombList().size(); i++) {
+            if (playground.getBombList().get(i).checkExplosion()) {
+                playground.getBombList().get(i).explodeBomb();
 
-                map.getBombs().get(i).getOwner().modifyCurrentBomb(-1);
+                playground.getBombList().get(i).getBombPlacer().modifyCurrentBomb(-1);
 
-                map.removeBomb(i);
+                playground.removeBomb(i);
 
                 i--;
             } else {
-                map.getBombs().get(i).updateUnblockList();
+                playground.getBombList().get(i).updateExplodedList();
             }
         }
 
-        for (int i = 0; i < map.getFlames().size(); i++) {
+        for (int i = 0; i < playground.getFlameList().size(); i++) {
             //kiểm tra flame đã hết thời gian chưa, nếu có thì xóa
-            if (map.getFlames().get(i).checkExpired()) {
-                map.removeFlame(i);
+            if (playground.getFlameList().get(i).hasEnded()) {
+                playground.deleteFlame(i);
 
                 i--;
             } else {
                 // nếu flame chạm bom, kích nổ bom đó luôn
-                for (int j = 0; j < map.getBombs().size(); j++)
-                    if (map.getFlames().get(i).checkIntersect(map.getBombs().get(j))) {
-                        map.getBombs().get(j).detonateBomb();
+                for (int j = 0; j < playground.getBombList().size(); j++)
+                    if (playground.getFlameList().get(i).isIntersect(playground.getBombList().get(j))) {
+                        playground.getBombList().get(j).explodeBomb();
 
-                        map.getBombs().get(j).getOwner().modifyCurrentBomb(-1);
+                        playground.getBombList().get(j).getBombPlacer().modifyCurrentBomb(-1);
 
-                        map.removeBomb(j);
+                        playground.removeBomb(j);
 
                         j--;
                     }
@@ -274,26 +274,26 @@ public class PvP_GamePlay {
         }
 
         // Player luôn di chuyển (đứng im tại chỗ tốc độ bằng 0)
-        player1.move();
-        player2.move();
+        hostPlayer.move();
+        guestPlayer.move();
 
-        player1.checkEatItems();
-        player2.checkEatItems();
+        hostPlayer.checkConsumedItems();
+        guestPlayer.checkConsumedItems();
 
         // Tạo ra các lệnh render
-        createCommand();
+        sendRenderCommand();
     }
 
     // giải mã các lệnh thao tác nhân vật từ client
-    public void decodePlayerCommand(String s) {
+    public void executeRenderCommand(String s) {
         if (s == null || s.length() == 0 || s.charAt(0) != '{') return;
         Bomber player;
         try {
             JSONObject command = new JSONObject(s);
             if (command.get("player").equals("PLAYER_1")) {
-                player = player1;
+                player = hostPlayer;
             } else {
-                player = player2;
+                player = guestPlayer;
             }
 
             switch ((String) command.get("direction")) {
@@ -302,21 +302,21 @@ public class PvP_GamePlay {
                         player.placeBomb();
                     }
                     break;
-                case "RIGHT_":
-                    player.setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT_, (boolean) command.get("status"));
+                case "RIGHT":
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.RIGHT, (boolean) command.get("status"));
                     break;
-                case "LEFT_":
-                    player.setDirectionOfObject(MovingObject.DirectionOfObject.LEFT_, (boolean) command.get("status"));
+                case "LEFT":
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.LEFT, (boolean) command.get("status"));
                     break;
-                case "UP_":
-                    player.setDirectionOfObject(MovingObject.DirectionOfObject.UP_, (boolean) command.get("status"));
+                case "UP":
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.UP, (boolean) command.get("status"));
                     break;
-                case "DOWN_":
-                    player.setDirectionOfObject(MovingObject.DirectionOfObject.DOWN_, (boolean) command.get("status"));
+                case "DOWN":
+                    player.setDirectionOfObject(MovingObject.DirectionOfObject.DOWN, (boolean) command.get("status"));
                     break;
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException event) {
+            event.printStackTrace();
         }
     }
 }

@@ -8,9 +8,9 @@ public class Item extends Block {
      * List type of item.
      */
     public enum typeOfItems {
-        BOMB_ITEM_,
-        FLAME_ITEM_,
-        SPEED_ITEM_,
+        ITEM_BOMB_,
+        ITEM_FLAME_,
+        ITEM_SPEED_,
     }
 
     /**
@@ -19,21 +19,21 @@ public class Item extends Block {
     typeOfItems type;
 
     /**
-     * Status if this item has been eaten.
+     * Status if this item has been consumed.
      */
-    private boolean ateStatus = false;
+    private boolean consumed = false;
 
     public typeOfItems getType() {
         return type;
     }
 
-    public void setAteStatus(boolean ateStatus) {
+    public void setConsumed(boolean consumed) {
 
-        this.ateStatus = ateStatus;
+        this.consumed = consumed;
     }
 
-    public boolean getAteStatus() {
-        return ateStatus;
+    public boolean getConsumed() {
+        return consumed;
     }
 
     /**
@@ -66,22 +66,22 @@ public class Item extends Block {
     }
 
     @Override
-    public void setFinalStateImageInfo() {
-        if (ateStatus) {
-            FINAL_STATE_IMAGE = FilesPath.Grass;
+    public void setEndingStateImageInfo() {
+        if (consumed) {
+            ENDING_STATE_IMAGE = FilesPath.Grass;
         } else {
-            if (type == typeOfItems.BOMB_ITEM_) {
-                FINAL_STATE_IMAGE = FilesPath.PowerUpBomb;
-            } else if (type == typeOfItems.FLAME_ITEM_) {
-                FINAL_STATE_IMAGE = FilesPath.PowerUpFlame;
+            if (type == typeOfItems.ITEM_BOMB_) {
+                ENDING_STATE_IMAGE = FilesPath.PowerUpBomb;
+            } else if (type == typeOfItems.ITEM_FLAME_) {
+                ENDING_STATE_IMAGE = FilesPath.PowerUpFlame;
             } else {
-                FINAL_STATE_IMAGE = FilesPath.PowerUpSpeed;
+                ENDING_STATE_IMAGE = FilesPath.PowerUpSpeed;
             }
         }
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(5);
+    public void setSettingGraphic() {
+        setFramePerSprite(5);
     }
 }

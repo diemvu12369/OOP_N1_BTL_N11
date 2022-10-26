@@ -33,8 +33,8 @@ public class RenderVariable {
     static {
         try {
             menuScene = new Scene(loaderScene1.load(), SCREEN_LENGTH, SCREEN_WIDTH);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException event) {
+            event.printStackTrace();
         }
     }
 

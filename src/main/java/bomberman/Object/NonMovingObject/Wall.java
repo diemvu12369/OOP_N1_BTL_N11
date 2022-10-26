@@ -13,13 +13,13 @@ public class Wall extends GameObject {
     /**
      * Số loại wall.
      */
-    private final int numberOfWallType = 16;
+    private final int totalWallType = 16;
 
     /**
      * Loại wall(Loại hình ảnh của wall).
      * Loại 0 là loại default, còn lại là có grafity.
      */
-    private int wallType;
+    private int typeOfWall;
 
     /**
      * Constructor cho Wall.
@@ -35,7 +35,7 @@ public class Wall extends GameObject {
 
         Random generator = new Random();
 
-        wallType = generator.nextInt(2) * (generator.nextInt(numberOfWallType - 1) + 1);
+        typeOfWall = generator.nextInt(2) * (generator.nextInt(totalWallType - 1) + 1);
     }
 
     @Override
@@ -44,21 +44,21 @@ public class Wall extends GameObject {
     }
 
     @Override
-    public void setGraphicSetting() {
-        setNumberOfFramePerSprite(3);
+    public void setSettingGraphic() {
+        setFramePerSprite(3);
     }
 
     @Override
     public void draw() {
         // Image hiện tại
-        Image currentImage = getImage();
+        Image displayImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double sizeOfSprite = currentImage.getWidth() / numberOfWallType;
+        double sizeOfSprite = displayImage.getWidth() / totalWallType;
 
         // Render
         setPosRender(-6, -6, 12, 12);
 
-        render(currentImage, wallType * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
+        render(displayImage, typeOfWall * sizeOfSprite, 0, sizeOfSprite, sizeOfSprite);
     }
 }

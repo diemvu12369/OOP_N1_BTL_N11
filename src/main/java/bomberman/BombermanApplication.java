@@ -33,11 +33,11 @@ public class BombermanApplication extends Application {
         MENU,  //TODO: code this
         PvP,
         PvB,
-        PvPPLAYING,
+        PvP_IN_EXECUTION,
     }
 
-    static Mode runningMode = Mode.MENU;
-    static boolean isChange = true;
+    static Mode currentMode = Mode.MENU;
+    static boolean hasChanged = true;
 
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
@@ -50,63 +50,63 @@ public class BombermanApplication extends Application {
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if (isChange) {
-                    if (runningMode == Mode.MENU) {
+                if (hasChanged) {
+                    if (currentMode == Mode.MENU) {
                         try {
-                            setMenuMode(stage);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            setupMenuMode(stage);
+                        } catch (IOException event) {
+                            event.printStackTrace();
                         }
-                    } else if (runningMode == Mode.PvB) {
-                        setPvBMode(stage);
-                    } else if (runningMode == Mode.PvP) {
-                        setPvPMode(stage);
-                    } else if (runningMode == Mode.PvPPLAYING) {
-                        startPvPGame(stage);
+                    } else if (currentMode == Mode.PvB) {
+                        setupPvBMode(stage);
+                    } else if (currentMode == Mode.PvP) {
+                        setupPvPMode(stage);
+                    } else if (currentMode == Mode.PvP_IN_EXECUTION) {
+                        executePvPGame(stage);
                     }
                 }
 
                 if (!stage.isShowing()) {
 
                     try {
-                        if (LANVariables.server!=null && !LANVariables.server.serverSocket.isClosed()) {
+                        if (LANVariables.server != null && !LANVariables.server.serverSocket.isClosed()) {
                             LANVariables.server.serverSocket.close();
                         }
-                        if (LANVariables.client!=null && !LANVariables.client.socket.isClosed()) {
+                        if (LANVariables.client != null && !LANVariables.client.socket.isClosed()) {
                             LANVariables.client.socket.close();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException event) {
+                        event.printStackTrace();
                     }
-                    LANVariables.client=null;
-                    LANVariables.server=null;
-                    GameVariables.playerRole=null;
+                    LANVariables.client = null;
+                    LANVariables.server = null;
+                    GameVariables.playerRole = null;
                     GameVariables.commandList = new JSONArray();
-                    GameVariables.tempCommandList = new JSONArray();
+                    GameVariables.temporaryCommandList = new JSONArray();
                     GameVariables.commandListString = new String();
-                    GameVariables.PvP=null;
+                    GameVariables.PvP = null;
                 }
             }
         }.start();
 
         stage.show();
-        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        stage.setX((primScreenBounds.getWidth() - RenderVariable.SCREEN_LENGTH) / 2);
-        stage.setY((primScreenBounds.getHeight() - RenderVariable.SCREEN_WIDTH) / 2);
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX((primaryScreenBounds.getWidth() - RenderVariable.SCREEN_LENGTH) / 2);
+        stage.setY((primaryScreenBounds.getHeight() - RenderVariable.SCREEN_WIDTH) / 2);
     }
 
     public static void main(String[] args) {
         launch();
     }
 
-    public static void setPvBMode(Stage stage) {
-        isChange = false;
-        runningMode = Mode.PvB;
+    public static void setupPvBMode(Stage stage) {
+        hasChanged = false;
+        currentMode = Mode.PvB;
 
         GameVariables.PvB = new PvB_GamePlay();
 
         GameVariables.PvB.render();
-        GameVariables.PvB.playPlayGroundAudio();
+        GameVariables.PvB.playBackgroundAudio();
 
         RenderVariable.scene.setOnMouseClicked(mouseEvent -> {
             double x = mouseEvent.getX();
@@ -124,10 +124,10 @@ public class BombermanApplication extends Application {
             }
         });
 
-        RenderVariable.scene.setOnKeyPressed(GameVariables.PvB::inputKeyPress);
-        RenderVariable.scene.setOnKeyReleased(GameVariables.PvB::inputKeyRelease);
+        RenderVariable.scene.setOnKeyPressed(GameVariables.PvB::inputPressedKey);
+        RenderVariable.scene.setOnKeyReleased(GameVariables.PvB::inputReleasedKey);
 
-        GameVariables.PvB.setGameStatus(PvB_GamePlay.typeOfGameStatus.PLAYING_);
+        GameVariables.PvB.setStatus(PvB_GamePlay.typeOfStatus.ONGOING);
         new AnimationTimer() {
             boolean stopped = false;
 
@@ -136,20 +136,20 @@ public class BombermanApplication extends Application {
                 if (stopped) {
                     try {
                         Thread.sleep(4000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException event) {
+                        event.printStackTrace();
                     }
-                    runningMode = Mode.MENU;
+                    currentMode = Mode.MENU;
                 }
 
-                if (GameVariables.PvB.getGameStatus() == PvB_GamePlay.typeOfGameStatus.PLAYING_) {
-                    GameVariables.PvB.play();
+                if (GameVariables.PvB.getStatus() == PvB_GamePlay.typeOfStatus.ONGOING) {
+                    GameVariables.PvB.execute();
                 } else {
                     stopped = true;
                 }
 
-                if (runningMode == Mode.MENU) {
-                    isChange = true;
+                if (currentMode == Mode.MENU) {
+                    hasChanged = true;
                     GameVariables.PvB = null;
                     this.stop();
                 }
@@ -159,39 +159,39 @@ public class BombermanApplication extends Application {
         stage.setScene(RenderVariable.scene);
     }
 
-    public static void setMenuMode(Stage stage) throws IOException {
-        isChange = false;
+    public static void setupMenuMode(Stage stage) throws IOException {
+        hasChanged = false;
         Scene menuScene = RenderVariable.menuScene;
 
         stage.setTitle("Bomberman");
-        Group showS = (Group) menuScene.lookup("#showStart");
-        Group showS1 = (Group) menuScene.lookup("#showStart1");
-        Group joinSv = (Group) menuScene.lookup("#joinSv");
-        Group createSv = (Group) menuScene.lookup("#createSv");
-        showS.toFront();
-        showS1.toBack();
-        joinSv.toBack();
-        createSv.toBack();
+        Group showStart = (Group) menuScene.lookup("#showStart");
+        Group showStart1 = (Group) menuScene.lookup("#showStart1");
+        Group joinServer = (Group) menuScene.lookup("#joinServer");
+        Group createServer = (Group) menuScene.lookup("#createServer");
+        showStart.toFront();
+        showStart1.toBack();
+        joinServer.toBack();
+        createServer.toBack();
 
         ImageView imgPvB = (ImageView) menuScene.lookup("#playPvB");
         imgPvB.setOnMouseClicked(mouseEvent -> {
-            isChange = true;
-            runningMode = Mode.PvB;
+            hasChanged = true;
+            currentMode = Mode.PvB;
         });
 
 
         ImageView imgPvP = (ImageView) menuScene.lookup("#playPvP");
         imgPvP.setOnMouseClicked(mouseEvent -> {
-            isChange = true;
-            runningMode = Mode.PvP;
+            hasChanged = true;
+            currentMode = Mode.PvP;
         });
 
-        ImageView backToMenu = (ImageView) menuScene.lookup("#backMenu");
-        backToMenu.setOnMouseClicked(mouseEvent -> {
-            showS.toFront();
-            showS1.toBack();
-            joinSv.toBack();
-            createSv.toBack();
+        ImageView goBackMenu = (ImageView) menuScene.lookup("#backMenu");
+        goBackMenu.setOnMouseClicked(mouseEvent -> {
+            showStart.toFront();
+            showStart1.toBack();
+            joinServer.toBack();
+            createServer.toBack();
 
             TextArea IP = (TextArea) menuScene.lookup("#byIP");
             IP.setText("");
@@ -200,36 +200,36 @@ public class BombermanApplication extends Application {
         stage.setScene(menuScene);
     }
 
-    public static void setPvPMode(Stage stage) {
-        isChange = false;
+    public static void setupPvPMode(Stage stage) {
+        hasChanged = false;
         Scene menuScene = RenderVariable.menuScene;
 
-        Group showS = (Group) menuScene.lookup("#showStart");
-        Group showS1 = (Group) menuScene.lookup("#showStart1");
-        Group joinSv = (Group) menuScene.lookup("#joinSv");
-        Group createSv = (Group) menuScene.lookup("#createSv");
-        showS.toBack();
-        showS1.toFront();
-        ImageView imgCreate = (ImageView) menuScene.lookup("#createSV");
-        ImageView imgJoin = (ImageView) menuScene.lookup("#joinSV");
-        ImageView backToMenu = (ImageView) menuScene.lookup("#backMenu");
+        Group showStart = (Group) menuScene.lookup("#showStart");
+        Group showStart1 = (Group) menuScene.lookup("#showStart1");
+        Group joinServer = (Group) menuScene.lookup("#joinServer");
+        Group createServer = (Group) menuScene.lookup("#createServer");
+        showStart.toBack();
+        showStart1.toFront();
+        ImageView imageCreate = (ImageView) menuScene.lookup("#createSV");
+        ImageView imageJoin = (ImageView) menuScene.lookup("#joinSV");
+        ImageView goBackMenu = (ImageView) menuScene.lookup("#backMenu");
 
-        imgCreate.setDisable(false);
-        imgJoin.setDisable(false);
-        backToMenu.setDisable(false);
+        imageCreate.setDisable(false);
+        imageJoin.setDisable(false);
+        goBackMenu.setDisable(false);
 
-        imgCreate.setOnMouseClicked(mouseEvent1 -> {
-            createSv.toFront();
-            joinSv.toBack();
-            imgCreate.setDisable(true);
-            imgJoin.setDisable(true);
-            backToMenu.setDisable(true);
+        imageCreate.setOnMouseClicked(mouseEventNumber1 -> {
+            createServer.toFront();
+            joinServer.toBack();
+            imageCreate.setDisable(true);
+            imageJoin.setDisable(true);
+            goBackMenu.setDisable(true);
 
             try {
                 TextArea textIP = (TextArea) menuScene.lookup("#textIP");
                 textIP.setText(String.valueOf(InetAddress.getLocalHost().getHostAddress()));
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
+            } catch (UnknownHostException event) {
+                event.printStackTrace();
             }
 
             Server.createServer();
@@ -237,33 +237,33 @@ public class BombermanApplication extends Application {
             new Thread() {
                 public void run() {
                     try {
-                        Socket socket2 = LANVariables.server.serverSocket.accept();
-                        new EchoThread(socket2).start();
-                        isChange = true;
-                        runningMode = Mode.PvPPLAYING;
+                        Socket otherSocket = LANVariables.server.serverSocket.accept();
+                        new EchoThread(otherSocket).start();
+                        hasChanged = true;
+                        currentMode = Mode.PvP_IN_EXECUTION;
 
-                        GameVariables.PvP.needToWait = true;
+                        GameVariables.PvP.isWaiting = true;
 
                         this.stop();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException event) {
+                        event.printStackTrace();
                     }
                 }
             }.start();
         });
 
-        imgJoin.setOnMouseClicked(mouseEvent1 -> {
-            joinSv.toFront();
-            createSv.toBack();
+        imageJoin.setOnMouseClicked(mouseEventNumber1 -> {
+            joinServer.toFront();
+            createServer.toBack();
             Button join = (Button) menuScene.lookup("#join");
-            join.setOnMouseClicked(mouseEvent2 -> {
-                //imgCreate.setDisable(true);
-                //imgJoin.setDisable(true);
+            join.setOnMouseClicked(mouseEventNumber2 -> {
+                //imageCreate.setDisable(true);
+                //imageJoin.setDisable(true);
                 TextArea IP = (TextArea) menuScene.lookup("#byIP");
                 if (IP.getText().equals("")) {
                     return;
                 }
-                if (!Client.createClientWithIP(IP.getText())) {
+                if (!Client.createClientGivenIP(IP.getText())) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setContentText("IP invalid!");
                     alert.show();
@@ -271,8 +271,8 @@ public class BombermanApplication extends Application {
                 else {
                     // kết nối thành công tức là mình là client 2
                     GameVariables.playerRole = GameVariables.role.PLAYER_2;
-                    isChange = true;
-                    runningMode = Mode.PvPPLAYING;
+                    hasChanged = true;
+                    currentMode = Mode.PvP_IN_EXECUTION;
                 }
 
             });
@@ -282,52 +282,52 @@ public class BombermanApplication extends Application {
         stage.setScene(menuScene);
     }
 
-    public static void startPvPGame(Stage stage) {
-        isChange = false;
+    public static void executePvPGame(Stage stage) {
+        hasChanged = false;
 
-        RenderVariable.scene.setOnKeyPressed(Client::inputKeyPress);
-        RenderVariable.scene.setOnKeyReleased(Client::inputKeyRelease);
+        RenderVariable.scene.setOnKeyPressed(Client::inputPressedKey);
+        RenderVariable.scene.setOnKeyReleased(Client::inputReleasedKey);
 
-        Client.countCreateBomb = 0;
+        Client.countCreatedBomb = 0;
 
         new AnimationTimer() {
             boolean stopped = false;
             public void handle(long currentNanoTime) {
                 // ****** Xử lí chút đặt bomb *********
-                if (Client.alreadyCreateBombThisTurn) {
-                    Client.countCreateBomb ++;
+                if (Client.createdBombThisTurn) {
+                    Client.countCreatedBomb ++;
                 }
 
-                if (Client.countCreateBomb >= 5) {
-                    Client.alreadyCreateBombThisTurn = false;
-                    Client.countCreateBomb = 0;
+                if (Client.countCreatedBomb >= 5) {
+                    Client.createdBombThisTurn = false;
+                    Client.countCreatedBomb = 0;
                 }
 
                 // **************************************
 
                 if (GameVariables.playerRole == GameVariables.role.PLAYER_1) {
-                    if (GameVariables.PvP.getGameStatus() == PvP_GamePlay.typeOfGameStatus.PLAYING_) {
-                        GameVariables.PvP.play();
+                    if (GameVariables.PvP.getStatus() == PvP_GamePlay.typeOfStatus.ONGOING) {
+                        GameVariables.PvP.execute();
                     }
                 }
 
                 if (stopped) {
                     try {
                         Thread.sleep(4000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException event) {
+                        event.printStackTrace();
                     }
-                    runningMode = Mode.MENU;
+                    currentMode = Mode.MENU;
                 }
 
-                LANVariables.client.sendDataToServer("GET");
+                LANVariables.client.uploadDataToServer("GET");
 
                 //gọi client nhận dữ liệu và xử lý dữ liệu từ server
-                GameVariables.commandListString = LANVariables.client.readDataFromServer();
+                GameVariables.commandListString = LANVariables.client.downloadDataFromServer();
 
-                stopped = Client.decodeRenderCommand(GameVariables.commandListString);
+                stopped = Client.executeRenderCommand(GameVariables.commandListString);
 
-                if ((!(stage.isShowing())) || runningMode == Mode.MENU) {
+                if ((!(stage.isShowing())) || currentMode == Mode.MENU) {
                     SoundVariable.endAllSoundsOnly();
 
                     try {
@@ -335,18 +335,18 @@ public class BombermanApplication extends Application {
                             LANVariables.server.serverSocket.close();
                         }
                         LANVariables.client.socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException event) {
+                        event.printStackTrace();
                     }
 
-                    LANVariables.client=null;
-                    LANVariables.server=null;
-                    GameVariables.playerRole=null;
+                    LANVariables.client = null;
+                    LANVariables.server = null;
+                    GameVariables.playerRole = null;
                     GameVariables.commandList = new JSONArray();
-                    GameVariables.tempCommandList = new JSONArray();
+                    GameVariables.temporaryCommandList = new JSONArray();
                     GameVariables.commandListString = new String();
-                    GameVariables.PvP=null;
-                    isChange = true;
+                    GameVariables.PvP = null;
+                    hasChanged = true;
                     this.stop();
                 }
             }

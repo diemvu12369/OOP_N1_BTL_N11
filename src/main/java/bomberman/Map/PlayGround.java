@@ -45,7 +45,7 @@ public class PlayGround {
      */
     private int numberOfRow;
 
-    public int getNumberOfRow() {
+    public int numberOfRow() {
         return numberOfRow;
     }
 
@@ -54,7 +54,7 @@ public class PlayGround {
      */
     private int numberOfColumn;
 
-    public int getNumberOfColumn() {
+    public int numberOfColumn() {
         return numberOfColumn;
     }
 
@@ -68,59 +68,59 @@ public class PlayGround {
      */
     private GameObject[][] cells = new GameObject[50][50];
 
-    public GameObject getCells(int tempX, int tempY) {
+    public GameObject getCell(int tempX, int tempY) {
         return cells[tempX][tempY];
     }
 
     /**
      * List player.
      */
-    private ArrayList<Bomber> players = new ArrayList<>();
+    private ArrayList<Bomber> playerList = new ArrayList<>();
 
-    public ArrayList<Bomber> getPlayers() {
-        return players;
+    public ArrayList<Bomber> getPlayerList() {
+        return playerList;
     }
 
-    public void resetPlayers() {
-        players.clear();
+    public void resetPlayerList() {
+        playerList.clear();
     }
 
     /**
      * Threats.
      */
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+    private ArrayList<Enemy> enemyList = new ArrayList<>();
 
-    public ArrayList<Enemy> getEnemies() {
-        return enemies;
+    public ArrayList<Enemy> getEnemyList() {
+        return enemyList;
     }
 
     public void resetEnemies() {
-        enemies.clear();
+        enemyList.clear();
     }
 
     public void removeEnemy(int position) {
-        enemies.remove(position);
+        enemyList.remove(position);
     }
 
     /**
      * List bomb.
      */
-    private ArrayList<Bomb> bombs = new ArrayList<>();
+    private ArrayList<Bomb> bombList = new ArrayList<>();
 
-    public ArrayList<Bomb> getBombs() {
-        return bombs;
+    public ArrayList<Bomb> getBombList() {
+        return bombList;
     }
 
     public void resetBombs() {
-        bombs.clear();
+        bombList.clear();
     }
 
     public void addBomb(Bomb currentBomb) {
-        bombs.add(currentBomb);
+        bombList.add(currentBomb);
     }
 
     public void removeBomb(int index) {
-        bombs.remove(index);
+        bombList.remove(index);
     }
 
     /**
@@ -140,40 +140,40 @@ public class PlayGround {
     /**
      * List flame.
      */
-    private ArrayList<Flame> flames = new ArrayList<>();
+    private ArrayList<Flame> flameList = new ArrayList<>();
 
-    public ArrayList<Flame> getFlames() {
-        return flames;
+    public ArrayList<Flame> getFlameList() {
+        return flameList;
     }
 
     public void resetFlames() {
-        flames.clear();
+        flameList.clear();
     }
 
     public void addFlame(Flame tempFlame) {
-        flames.add(tempFlame);
+        flameList.add(tempFlame);
     }
 
-    public void removeFlame(int index) {
-        flames.remove(index);
+    public void deleteFlame(int index) {
+        flameList.remove(index);
     }
 
     /**
      * kích thước bản đồ theo chiều ngang.
      */
-    private double mapLength;
+    private double playgroundLength;
 
     public double getMapLength() {
-        return mapLength;
+        return playgroundLength;
     }
 
     /**
      * kích thước bản đồ theo chiều dọc.
      */
-    private double mapWidth;
+    private double playgroundWidth;
 
     public double getMapWidth() {
-        return mapWidth;
+        return playgroundWidth;
     }
 
     /**
@@ -191,43 +191,43 @@ public class PlayGround {
     /**
      * Khởi tạo 1 PlayGround(Map).
      *
-     * @param mapPath đường dẫn đến map
+     * @param playgroundPath đường dẫn đến playground
      */
-    public PlayGround(String mapPath) {
-        readMapsFromFile(mapPath);
+    public PlayGround(String playgroundPath) {
+        readMapsFromFile(playgroundPath);
 
         createMapAtLevel();
     }
 
     /**
-     * Nhập dữ liệu của map từ file.
+     * Nhập dữ liệu của playground từ file.
      *
-     * @param mapPath đường dẫn đến map
+     * @param playgroundPath đường dẫn đến playground
      */
-    private void readMapsFromFile(String mapPath) {
+    private void readMapsFromFile(String playgroundPath) {
         InputStream inputStream = null;
         BufferedReader reader = null;
 
         try {
-            inputStream = FilesPath.class.getResource(mapPath).openStream();
+            inputStream = FilesPath.class.getResource(playgroundPath).openStream();
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String[] item;
 
-            String line = reader.readLine();
-            item = line.split(" ");
+            String command = reader.readLine();
+            item = command.split(" ");
             maxLevel = Integer.parseInt(item[0]);
             numberOfRow = Integer.parseInt(item[1]);
             numberOfColumn = Integer.parseInt(item[2]);
 
-            mapLength = unitLength * numberOfColumn;
-            mapWidth = unitLength * numberOfRow;
+            playgroundLength = unitLength * numberOfColumn;
+            playgroundWidth = unitLength * numberOfRow;
 
             for (int currentLevel = 0; currentLevel < maxLevel; currentLevel++) {
                 for (int i = 0; i < numberOfRow; i++) {
-                    line = reader.readLine();
+                    command = reader.readLine();
                     for (int j = 0; j < numberOfColumn; j++) {
-                        allLevelMaps[currentLevel][i][j] = line.charAt(j);
+                        allLevelMaps[currentLevel][i][j] = command.charAt(j);
                     }
                 }
             }
@@ -246,10 +246,10 @@ public class PlayGround {
     }
 
     /**
-     * Tạo tình trạng map của level hiện tại.
+     * Tạo tình trạng playground của level hiện tại.
      */
     public void createMapAtLevel() {
-        resetPlayers();
+        resetPlayerList();
         resetEnemies();
         resetBombs();
         resetFlames();
@@ -259,7 +259,7 @@ public class PlayGround {
                 char tmp = allLevelMaps[level][i][j];
                 switch (tmp) {
                     case 'p':
-                        players.add(new Bomber(this, unitLength * j, unitLength * i));
+                        playerList.add(new Bomber(this, unitLength * j, unitLength * i));
                         cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '#':
@@ -272,24 +272,24 @@ public class PlayGround {
                         cells[i][j] = new Portal(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case 'b':
-                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.BOMB_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.ITEM_BOMB_);
                         break;
                     case 'f':
-                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.FLAME_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.ITEM_FLAME_);
                         break;
                     case 's':
-                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.SPEED_ITEM_);
+                        cells[i][j] = new Item(this, unitLength * j, unitLength * i, unitLength, unitLength, Item.typeOfItems.ITEM_SPEED_);
                         break;
                     case '1':
-                        enemies.add(new Balloom(this, unitLength * j, unitLength * i));
+                        enemyList.add(new Balloom(this, unitLength * j, unitLength * i));
                         cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '2':
-                        enemies.add(new Oneal(this, unitLength * j, unitLength * i));
+                        enemyList.add(new Oneal(this, unitLength * j, unitLength * i));
                         cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     case '3':
-                        enemies.add(new Teleport(this, unitLength * j, unitLength * i));
+                        enemyList.add(new Teleport(this, unitLength * j, unitLength * i));
                         cells[i][j] = new Grass(this, unitLength * j, unitLength * i, unitLength, unitLength);
                         break;
                     default:
@@ -321,21 +321,21 @@ public class PlayGround {
 
         // ô gạch chưa bị nổ
         if (cells[current_x][current_y] instanceof Brick) {
-            if (!((Brick) cells[current_x][current_y]).isFinalState()) {
+            if (!((Brick) cells[current_x][current_y]).isEndingState()) {
                 return true;
             }
         }
 
         // ô item chưa bị nổ
         if ((cells[current_x][current_y] instanceof Item)) {
-            if (!((Item) cells[current_x][current_y]).isFinalState()) {
+            if (!((Item) cells[current_x][current_y]).isEndingState()) {
                 return true;
             }
         }
 
         // ô portal chưa bị nổ
         if ((cells[current_x][current_y] instanceof Portal)) {
-            if (!((Portal) cells[current_x][current_y]).isFinalState()) {
+            if (!((Portal) cells[current_x][current_y]).isEndingState()) {
                 return true;
             }
         }
@@ -344,7 +344,7 @@ public class PlayGround {
     }
 
     /**
-     * Render map ra screen.
+     * Render playground ra screen.
      */
     public void render() {
         backGround.draw();
@@ -355,21 +355,21 @@ public class PlayGround {
             }
         }
 
-        for (Bomb x : bombs) {
+        for (Bomb x : bombList) {
             x.draw();
         }
 
-        for (Bomber player : players) {
+        for (Bomber player : playerList) {
             if (player != null) {
                 player.draw();
             }
         }
 
-        for (Enemy enemy : enemies) {
+        for (Enemy enemy : enemyList) {
             enemy.draw();
         }
 
-        for (Flame flame : flames) {
+        for (Flame flame : flameList) {
             flame.draw();
         }
         if (RenderVariable.stateSound) {

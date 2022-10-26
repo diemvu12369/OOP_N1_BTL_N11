@@ -26,7 +26,7 @@ public abstract class MovingObject extends GameObject {
 
         setDirectionOfObject(DirectionOfObject.NONE_, true);
 
-        currentState = ObjectMovementState.HORIZONTAL_;
+        currentState = ObjectHeading.HORIZONTAL;
     }
 
     // MOVEMENT STATE ---------------------------------------------------------------------------
@@ -35,10 +35,10 @@ public abstract class MovingObject extends GameObject {
      * Hướng di chuyển của object.
      */
     public enum DirectionOfObject {
-        LEFT_,
-        RIGHT_,
-        UP_,
-        DOWN_,
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
         NONE_
     }
 
@@ -71,15 +71,15 @@ public abstract class MovingObject extends GameObject {
     /**
      * Trạng thái di chuyển dọc hoặc ngang của object.
      */
-    public enum ObjectMovementState {
-        VERTICAL_,
-        HORIZONTAL_
+    public enum ObjectHeading {
+        VERTICAL,
+        HORIZONTAL
     }
 
     /**
      * Trạng thái di chuyển hiện tại của object.
      */
-    private ObjectMovementState currentState;
+    private ObjectHeading currentState;
 
     //---------------------------------------------------------------------------------------------
 
@@ -114,16 +114,16 @@ public abstract class MovingObject extends GameObject {
         deltaY = 0;
 
         switch (currentDirection) {
-            case LEFT_:
+            case LEFT:
                 deltaX -= speed;
                 break;
-            case RIGHT_:
+            case RIGHT:
                 deltaX += speed;
                 break;
-            case UP_:
+            case UP:
                 deltaY -= speed;
                 break;
-            case DOWN_:
+            case DOWN:
                 deltaY += speed;
                 break;
         }
@@ -143,8 +143,8 @@ public abstract class MovingObject extends GameObject {
         int maxY = GameVariables.calculateCellIndex(current_y + this.getLength() - 1);
 
         //gặp bomb
-        for (Bomb bomb : this.getCorrespondingPlayGround().getBombs()) {
-            if (bomb.checkIntersect(current_x, current_x + this.getWidth() - 1,
+        for (Bomb bomb : this.getCorrespondingPlayGround().getBombList()) {
+            if (bomb.isIntersect(current_x, current_x + this.getWidth() - 1,
                     current_y, current_y + this.getLength() - 1) &&
                     bomb.checkBlockStatusWithObject(this)) {
                 return false;
@@ -176,13 +176,13 @@ public abstract class MovingObject extends GameObject {
         //Biến này cộng vào tọa độ để object luôn nằm giữa cell.
         double adjustPosition = (unitLength - this.getLength()) / 2;
 
-        if (currentState == ObjectMovementState.HORIZONTAL_) {
-            if (currentDirection == DirectionOfObject.LEFT_ || currentDirection == DirectionOfObject.RIGHT_) {
+        if (currentState == ObjectHeading.HORIZONTAL) {
+            if (currentDirection == DirectionOfObject.LEFT || currentDirection == DirectionOfObject.RIGHT) {
                 if (deltaX != 0 && checkCanMove(currentX + deltaX, currentY)) {
                     setX(currentX + deltaX);
                 }
-            } else if (currentDirection == DirectionOfObject.UP_ || currentDirection == DirectionOfObject.DOWN_) {
-                int current_x = GameVariables.calculateCellIndex(this.getCenterX());
+            } else if (currentDirection == DirectionOfObject.UP || currentDirection == DirectionOfObject.DOWN) {
+                int current_x = GameVariables.calculateCellIndex(this.getXCenter());
 
                 double newPositionX = current_x * unitLength + adjustPosition;
 
@@ -190,16 +190,16 @@ public abstract class MovingObject extends GameObject {
                     setX(newPositionX);
                     setY(currentY + deltaY);
 
-                    currentState = ObjectMovementState.VERTICAL_;
+                    currentState = ObjectHeading.VERTICAL;
                 }
             }
-        } else if (currentState == ObjectMovementState.VERTICAL_) {
-            if (currentDirection == DirectionOfObject.UP_ || currentDirection == DirectionOfObject.DOWN_) {
+        } else if (currentState == ObjectHeading.VERTICAL) {
+            if (currentDirection == DirectionOfObject.UP || currentDirection == DirectionOfObject.DOWN) {
                 if (deltaY != 0 && checkCanMove(currentX, currentY + deltaY)) {
                     setY(currentY + deltaY);
                 }
-            } else if (currentDirection == DirectionOfObject.LEFT_ || currentDirection == DirectionOfObject.RIGHT_) {
-                int current_y = GameVariables.calculateCellIndex(this.getCenterY());
+            } else if (currentDirection == DirectionOfObject.LEFT || currentDirection == DirectionOfObject.RIGHT) {
+                int current_y = GameVariables.calculateCellIndex(this.getYCenter());
 
                 double newPositionY = current_y * unitLength + adjustPosition;
 
@@ -207,7 +207,7 @@ public abstract class MovingObject extends GameObject {
                     setX(currentX + deltaX);
                     setY(newPositionY);
 
-                    currentState = ObjectMovementState.HORIZONTAL_;
+                    currentState = ObjectHeading.HORIZONTAL;
                 }
             }
         }
@@ -215,21 +215,21 @@ public abstract class MovingObject extends GameObject {
 
     // *************************** GRAPHIC **********************************************************
 
-    DirectionOfObject lastDirection = DirectionOfObject.LEFT_;
+    DirectionOfObject lastDirection = DirectionOfObject.LEFT;
 
     /**
      * Chỉ số direction để tính được renderY cho image.
      */
     private int getYByDirection() {
-        if (lastDirection == DirectionOfObject.UP_) {
+        if (lastDirection == DirectionOfObject.UP) {
             return 0;
         }
 
-        if (lastDirection == DirectionOfObject.DOWN_) {
+        if (lastDirection == DirectionOfObject.DOWN) {
             return 1;
         }
 
-        if (lastDirection == DirectionOfObject.LEFT_) {
+        if (lastDirection == DirectionOfObject.LEFT) {
             return 2;
         }
 
@@ -244,15 +244,15 @@ public abstract class MovingObject extends GameObject {
         }
 
         // Image hiện tại
-        Image currentImage = getImage();
+        Image displayImage = getImage();
 
         // Tính toán thông tin image hiện tại
-        double widthOfImage = currentImage.getHeight();
-        double lengthOfImage = currentImage.getWidth();
+        double widthOfImage = displayImage.getHeight();
+        double lengthOfImage = displayImage.getWidth();
 
         double sizeOfSprite = widthOfImage / 4;
 
-        numberOfSprite = (int) (lengthOfImage / sizeOfSprite) - 1;
+        spriteNumber = (int) (lengthOfImage / sizeOfSprite) - 1;
 
         // Tính toán thông tin render
         double renderX;
@@ -261,23 +261,23 @@ public abstract class MovingObject extends GameObject {
         if (currentDirection == DirectionOfObject.NONE_) {
             renderX = 0;
 
-            resetFrameCount();
+            resetCountFrame();
         } else {
             // Tính toán currentFrame
-            if (gameFrameCount >= (numberOfSprite * numberOfFramePerSprite)) {
-                gameFrameCount = gameFrameCount % (numberOfSprite * numberOfFramePerSprite);
+            if (countGameFrame >= (spriteNumber * framePerSprite)) {
+                countGameFrame = countGameFrame % (spriteNumber * framePerSprite);
             }
 
-            currentSprite = gameFrameCount / numberOfFramePerSprite;
+            processingSprite = countGameFrame / framePerSprite;
 
-            gameFrameCount++;
+            countGameFrame++;
 
-            renderX = (currentSprite + 1) * sizeOfSprite;
+            renderX = (processingSprite + 1) * sizeOfSprite;
         }
 
         // Render
         setPosRender(0, 0, 0, 0);
 
-        render(currentImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
+        render(displayImage, renderX, renderY, sizeOfSprite, sizeOfSprite);
     }
 }

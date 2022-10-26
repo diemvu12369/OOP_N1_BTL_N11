@@ -14,8 +14,8 @@ public class Server {
     public Server() {
         try {
             serverSocket = new ServerSocket(LANVariables.PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException event) {
+            event.printStackTrace();
         }
     }
 
@@ -31,14 +31,14 @@ public class Server {
         // tạo luồng giao tiếp giữa server và client 1
         try {
             socket = LANVariables.server.serverSocket.accept();
-        } catch (IOException e) {
-            System.out.println("I/O error: " + e);
+        } catch (IOException event) {
+            System.out.println("I/O error: " + event);
         }
         new EchoThread(socket).start();
 
         GameVariables.PvP = new PvP_GamePlay();
-        GameVariables.PvP.play();
+        GameVariables.PvP.execute();
         GameVariables.playerRole = GameVariables.role.PLAYER_1;
-        GameVariables.PvP.setGameStatus(PvP_GamePlay.typeOfGameStatus.PLAYING_);
+        GameVariables.PvP.setStatus(PvP_GamePlay.typeOfStatus.ONGOING);
     }
 }
